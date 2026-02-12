@@ -6,13 +6,16 @@ from src.api_client.models import (
     TokenResponse,
     RefreshTokenRequest,
 )
+from src.modile.config import get_config
 
 
-class AuthClient(BaseAPIClient):
+class AuthClient:
+    def __init__(self, api: BaseAPIClient):
+        self.api = api
 
     async def register(self, user: UserCreate) -> UserOut:
         try:
-            response = await self._request(
+            response = await self.api.request(
                 "POST",
                 "/auth/register",
                 json=user.model_dump()
@@ -27,7 +30,7 @@ class AuthClient(BaseAPIClient):
         """
         :raise InvalidCredentialsException: При неверных данных
         """
-        response = await self._request(
+        response = await self.api.request(
             "POST",
             "/auth/login",
             data={
@@ -40,20 +43,23 @@ class AuthClient(BaseAPIClient):
         )
 
         data = TokenResponse(**response.json())
-        self.set_access_token(data.access_token)
+        token_storage = get_config().token_storage
+        token_storage.set_access_token(data.access_token)
         return data
 
     async def refresh_token(self, refresh_token: str) -> TokenResponse:
         try:
-            response = await self._request(
+            response = await self.api.request(
                 "POST",
                 "/auth/refresh_token",
                 json=RefreshTokenRequest(
                     refresh_token=refresh_token
-                ).model_dump()
+                ).model_dump(),
+                skip_refresh = True
             )
             data = TokenResponse(**response.json())
-            self.set_access_token(data.access_token)
+            token_storage = get_config().token_storage
+            token_storage.set_access_token(data.access_token)
             return data
         except APIClientError as e:
             if e.status_code == 403:
@@ -62,5 +68,6 @@ class AuthClient(BaseAPIClient):
 
     async def logout(self) -> None:
         """Выйдет из учётной записи и сделает невалидным refresh токен"""
-        await self._request("POST", "/auth/logout")
-        self.clear_token()
+        await self.api.request("POST", "/auth/logout")
+        token_storage = get_config().token_storage
+        token_storage.clear_tokens()

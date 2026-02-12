@@ -2,28 +2,30 @@ import keyring
 
 
 class TokenStorage:
-    SERVICE = "resume_app"
+    def __init__(self):
+        self.SERVICE = "resume_app"
+        self.access = None
 
-    def save_refresh(self, token: str):
+    def set_refresh_token(self, token: str):
         keyring.set_password(self.SERVICE, "refresh_token", token)
 
-    def get_refresh(self) -> str | None:
+    def get_refresh_token(self) -> str | None:
         return keyring.get_password(self.SERVICE, "refresh_token")
 
-    def delete_refresh(self):
+    def delete_refresh_token(self):
         keyring.delete_password(self.SERVICE, "refresh_token")
 
 
-_token_storage: TokenStorage = None
+    def set_access_token(self, token: str):
+        self.access = token
 
+    def get_access_token(self) -> str | None:
+        return self.access
 
-def init_token_storage():
-    global _token_storage
-    _token_storage = TokenStorage()
+    def delete_access_token(self):
+        self.access = None
 
-
-def get_token_storage():
-    global _token_storage
-    if _token_storage is None:
-        raise RuntimeError("TokenStorage не инициализированно")
-    return _token_storage
+    def clear_tokens(self):
+        """Очищает refresh и access токены"""
+        self.delete_refresh_token()
+        self.delete_access_token()

@@ -5,7 +5,8 @@ from kivy.app import App
 from kivy.graphics import Color, Rectangle
 from kivy.uix.screenmanager import ScreenManager, FadeTransition
 
-from src.api_client.auth import AuthClient
+from src.api_client.base import BaseAPIClient, TokenManager
+from src.api_client.services.auth import AuthClient
 from src.modile.config import get_config
 from src.modile.ui.screens.auth.login import LoginScreen
 from src.modile.ui.screens.auth.register import RegisterScreen
@@ -32,7 +33,10 @@ class AuthApp(App):
     def build(self):
         conf = get_config()
         self.loop = asyncio.get_event_loop()
-        self.auth_client = AuthClient(conf.base_url)
+        self.base_client = BaseAPIClient(conf.base_url)
+        self.auth_client = AuthClient(self.base_client)
+        token_manager = TokenManager(self.auth_client)
+        self.base_client.set_token_manager(token_manager)
 
         sm = RootScreenManager(
             transition=FadeTransition(duration=0.15)
@@ -48,4 +52,4 @@ class AuthApp(App):
 
     def on_stop(self):
         loop = asyncio.get_running_loop()
-        loop.create_task(self.auth_client.close())
+        loop.create_task(self.base_client.close())

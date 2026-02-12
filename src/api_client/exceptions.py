@@ -11,6 +11,10 @@ class ServerError(APIClientError):
         self.json = json
 
 
+class NotFoundData(APIClientError):
+    pass
+
+
 class Unauthorized(APIClientError):
     pass
 

@@ -2,11 +2,10 @@ from typing import Tuple
 
 from pydantic import ValidationError
 
-from src.api_client.auth import AuthClient
-from src.api_client.exceptions import UserAlreadyRegistered, InvalidCredentialsException, InvalidTokenException, \
-    UserNotFound, Unauthorized
+from src.api_client.services.auth import AuthClient
+from src.api_client.exceptions import UserAlreadyRegistered, UserNotFound, Unauthorized
 from src.api_client.models import UserCreate, TokenResponse
-from src.modile.utils.token_storage import get_token_storage
+from src.modile.config import get_config
 
 
 class AuthViewModel:
@@ -29,16 +28,16 @@ class AuthViewModel:
         """
         Попробует получить данные для входа с refresh токена.
         """
-        refresh_storage = get_token_storage()
-        refresh_token = refresh_storage.get_refresh()
+        token_storage = get_config().token_storage
+        refresh_token = token_storage.get_refresh_token()
         try:
             token = await self.auth_client.refresh_token(refresh_token)
             return token, "Успешно"
         except Unauthorized:
-            refresh_storage.delete_refresh()
+            token_storage.delete_refresh_token()
             return None, "Невалидный токен"
         except UserNotFound:
-            refresh_storage.delete_refresh()
+            token_storage.delete_refresh_token()
             return None, "Пользователь не найден"
         except Exception as e:
             return None, str(e)

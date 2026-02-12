@@ -16,6 +16,12 @@ class UserOut(BaseModel):
     created_at: str
 
 
+class RequirementsOut(BaseModel):
+    requirements_id: int
+    user_id: int
+    requirements: str
+
+
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str

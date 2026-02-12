@@ -11,7 +11,6 @@ from kivy.uix.screenmanager import Screen
 from src.modile.config import get_config
 from src.modile.ui.creating_elements import create_textinput, create_button
 from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
-from src.modile.utils.token_storage import get_token_storage
 from src.modile.view_models.auth_vm import AuthViewModel
 
 
@@ -55,7 +54,7 @@ class LoginScreen(Screen):
             self.viewmodel.check_refresh_token(),
             conf.global_event_loop
         )
-        if self.viewmodel.auth_client.get_access_token():
+        if conf.token_storage.get_access_token():
             pass
             # ПОКАЗЫВАЕМ новое окно
 

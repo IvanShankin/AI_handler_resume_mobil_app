@@ -3,9 +3,11 @@ import asyncio
 from src.modile.config import set_config
 from src.modile.models.config_model import Config
 from src.modile.ui.main_ui import AuthApp
+from src.modile.utils.token_storage import init_token_storage
 
 
 async def main():
+    init_token_storage()
     async_loop = asyncio.new_event_loop()
     conf = Config(
         base_url = "http://localhost:8080",

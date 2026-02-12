@@ -1,4 +1,5 @@
 from src.api_client.base import BaseAPIClient
+from src.api_client.exceptions import UserAlreadyRegistered, UserNotFound, APIClientError
 from src.api_client.models import (
     UserCreate,
     UserOut,
@@ -10,14 +11,22 @@ from src.api_client.models import (
 class AuthClient(BaseAPIClient):
 
     async def register(self, user: UserCreate) -> UserOut:
-        response = await self._request(
-            "POST",
-            "/auth/register",
-            json=user.model_dump()
-        )
-        return UserOut(**response.json())
+        try:
+            response = await self._request(
+                "POST",
+                "/auth/register",
+                json=user.model_dump()
+            )
+            return UserOut(**response.json())
+        except APIClientError as e:
+            if e.status_code == 409:
+                raise UserAlreadyRegistered()
+            raise e
 
     async def login(self, username: str, password: str) -> TokenResponse:
+        """
+        :raise InvalidCredentialsException: При неверных данных
+        """
         response = await self._request(
             "POST",
             "/auth/login",
@@ -35,18 +44,23 @@ class AuthClient(BaseAPIClient):
         return data
 
     async def refresh_token(self, refresh_token: str) -> TokenResponse:
-        response = await self._request(
-            "POST",
-            "/auth/refresh_token",
-            json=RefreshTokenRequest(
-                refresh_token=refresh_token
-            ).model_dump()
-        )
-
-        data = TokenResponse(**response.json())
-        self.set_access_token(data.access_token)
-        return data
+        try:
+            response = await self._request(
+                "POST",
+                "/auth/refresh_token",
+                json=RefreshTokenRequest(
+                    refresh_token=refresh_token
+                ).model_dump()
+            )
+            data = TokenResponse(**response.json())
+            self.set_access_token(data.access_token)
+            return data
+        except APIClientError as e:
+            if e.status_code == 403:
+                raise UserNotFound()
+            raise e
 
     async def logout(self) -> None:
+        """Выйдет из учётной записи и сделает невалидным refresh токен"""
         await self._request("POST", "/auth/logout")
         self.clear_token()

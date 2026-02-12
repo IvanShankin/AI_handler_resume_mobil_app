@@ -1,35 +1,66 @@
+from typing import Tuple
+
+from pydantic import ValidationError
+
 from src.api_client.auth import AuthClient
-from src.api_client.models import UserCreate
+from src.api_client.exceptions import UserAlreadyRegistered, InvalidCredentialsException, InvalidTokenException, \
+    UserNotFound, Unauthorized
+from src.api_client.models import UserCreate, TokenResponse
+from src.modile.utils.token_storage import get_token_storage
 
 
 class AuthViewModel:
     def __init__(self, auth_client: AuthClient):
         self.auth_client = auth_client
 
-    async def login(self, username: str, password: str):
+    async def login(self, username: str, password: str) -> Tuple[TokenResponse | None, str]:
         if not username or not password:
-            return False, "Введите email и пароль"
+            return None, "Введите email и пароль"
 
         try:
             token = await self.auth_client.login(username, password)
-            return True, token
+            return token, "Успешная авторизация"
+        except Unauthorized:
+            return None, f"Неверные данные для входа"
         except Exception as e:
-            return False, str(e)
+            return None, str(e)
+
+    async def check_refresh_token(self) -> Tuple[TokenResponse | None, str]:
+        """
+        Попробует получить данные для входа с refresh токена.
+        """
+        refresh_storage = get_token_storage()
+        refresh_token = refresh_storage.get_refresh()
+        try:
+            token = await self.auth_client.refresh_token(refresh_token)
+            return token, "Успешно"
+        except Unauthorized:
+            refresh_storage.delete_refresh()
+            return None, "Невалидный токен"
+        except UserNotFound:
+            refresh_storage.delete_refresh()
+            return None, "Пользователь не найден"
+        except Exception as e:
+            return None, str(e)
 
 
 class RegViewModel:
     def __init__(self, auth_client: AuthClient):
         self.auth_client = auth_client
 
-    async def registration(self, email: str, password: str, full_name: str):
+    async def registration(self, email: str, password: str, full_name: str) -> Tuple[TokenResponse | None, str]:
         if not email or not password or not full_name:
-            return False, "Введите email, пароль и полное имя"
+            return None, "Введите email, пароль и полное имя"
 
         try:
-            user = await self.auth_client.register(UserCreate(
+            await self.auth_client.register(UserCreate(
                 username=email, password=password, full_name=full_name
             ))
             token = await self.auth_client.login(email, password)
-            return True, token
+            return token, "Регистрация прошла успешно"
+        except ValidationError:
+            return None, "Введены некорректные данные. Попробуйте ещё раз"
+        except UserAlreadyRegistered:
+            return None, f"Пользователь с email = '{email}' уже зарегистрирован"
         except Exception as e:
-            return False, str(e)
+            return None, str(e)

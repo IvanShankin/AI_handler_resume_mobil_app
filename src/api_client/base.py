@@ -1,5 +1,7 @@
-import httpx
 from typing import Optional
+
+import httpx
+
 from src.api_client.exceptions import Unauthorized, APIClientError
 
 
@@ -16,6 +18,9 @@ class BaseAPIClient:
 
     def set_access_token(self, token: str):
         self._access_token = token
+
+    def get_access_token(self) -> str | None:
+        return self._access_token
 
     def clear_token(self):
         self._access_token = None
@@ -38,7 +43,7 @@ class BaseAPIClient:
 
         if response.status_code >= 400:
             raise APIClientError(
-                f"{response.status_code}: {response.text}"
+                response.status_code,
             )
 
         return response

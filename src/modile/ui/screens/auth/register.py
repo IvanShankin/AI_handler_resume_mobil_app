@@ -1,20 +1,15 @@
 import asyncio
-import threading
 
-from kivy.app import App
+from kivy.clock import Clock
 from kivy.graphics import Color, Rectangle
 from kivy.uix.anchorlayout import AnchorLayout
-from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
-from kivy.uix.textinput import TextInput
-from kivy.uix.button import Button
-from kivy.clock import Clock
+from kivy.uix.screenmanager import Screen
 
-from src.api_client.auth import AuthClient
-from src.api_client.models import UserCreate
 from src.modile.config import get_config
 from src.modile.ui.creating_elements import create_textinput, create_button
+from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
 from src.modile.view_models.auth_vm import RegViewModel
 
 
@@ -70,15 +65,15 @@ class RegisterScreen(Screen):
         asyncio.run_coroutine_threadsafe(self._register(email, password, fullname), config.global_event_loop)
 
     async def _register(self, email, password, full_name):
-        success, result = await self.viewmodel.registration(email, password, full_name)
+        token, result = await self.viewmodel.registration(email, password, full_name)
 
-        if success:
+        if token:
             msg = f"Успешная регистрация"
         else:
             msg = f"Ошибка: {result}"
 
-        Clock.schedule_once(lambda dt: setattr(self.message_label, "text", msg))
+        Clock.schedule_once(lambda dt: self._show_model_window(msg))
 
-    def update_message(self, msg):
-        Clock.schedule_once(lambda dt: setattr(self.message_label, 'text', msg))
+    def _show_model_window(self, message):
+        show_modal(message)
 

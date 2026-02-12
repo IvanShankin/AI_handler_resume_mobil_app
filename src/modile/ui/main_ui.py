@@ -7,11 +7,14 @@ from kivy.uix.screenmanager import ScreenManager, FadeTransition
 
 from src.api_client.base import BaseAPIClient, TokenManager
 from src.api_client.services.auth import AuthClient
+from src.api_client.services.requirements import RequirementClient
 from src.modile.config import get_config
 from src.modile.ui.screens.auth.login import LoginScreen
 from src.modile.ui.screens.auth.register import RegisterScreen
+from src.modile.ui.screens.requirements.all_requirements import AllRequirementsScreen
 from src.modile.utils.event_loop import start_loop
 from src.modile.view_models.auth_vm import AuthViewModel, RegViewModel
+from src.modile.view_models.requirements import RequirementsModel
 
 
 class RootScreenManager(ScreenManager):
@@ -38,11 +41,14 @@ class AuthApp(App):
         token_manager = TokenManager(self.auth_client)
         self.base_client.set_token_manager(token_manager)
 
+        self.req_client = RequirementClient(self.base_client)
+
         sm = RootScreenManager(
             transition=FadeTransition(duration=0.15)
         )
         sm.add_widget(LoginScreen(name="login", viewmodel=AuthViewModel(auth_client=self.auth_client)))
         sm.add_widget(RegisterScreen(name="register", viewmodel=RegViewModel(auth_client=self.auth_client)))
+        sm.add_widget(AllRequirementsScreen(name="all_requirements", viewmodel=RequirementsModel(req_client=self.req_client)))
 
         # Запускаем глобальный event loop в отдельном потоке
         t = threading.Thread(target=start_loop, args=(conf.global_event_loop,), daemon=True)

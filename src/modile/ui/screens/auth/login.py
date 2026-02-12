@@ -55,15 +55,17 @@ class LoginScreen(Screen):
             conf.global_event_loop
         )
         if conf.token_storage.get_access_token():
-            pass
-            # ПОКАЗЫВАЕМ новое окно
+            self.go_to_all_requirements()
 
     def _update_bg(self, *args):
         self.bg.size = self.size
         self.bg.pos = self.pos
 
-    def go_to_register(self, button):
+    def go_to_register(self, *args):
         self.manager.current = "register"
+
+    def go_to_all_requirements(self, *args):
+        self.manager.current = "all_requirements"
 
     def login_clicked(self, instance):
         username = self.username_input.text

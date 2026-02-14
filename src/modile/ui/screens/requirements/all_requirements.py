@@ -14,15 +14,16 @@ from kivy.uix.gridlayout import GridLayout
 
 from src.api_client.models import RequirementsOut
 from src.modile.config import get_config
+from src.modile.ui.elements.buttons import RoundButton
 from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
-
+from src.modile.view_models.requirements import RequirementsModel
 
 MIN_CELL_WIDTH = 260  # минимальная ширина карточки (подбирай)
 CARD_HEIGHT = 120     # высота карточки
 
 
 class AllRequirementsScreen(Screen):
-    def __init__(self, viewmodel, **kwargs):
+    def __init__(self, viewmodel: RequirementsModel, **kwargs):
         super().__init__(**kwargs)
         self.viewmodel = viewmodel
 
@@ -42,7 +43,7 @@ class AllRequirementsScreen(Screen):
         vbox = BoxLayout(orientation="vertical", spacing=10, padding=16, size_hint=(0.98, 0.98))
         container.add_widget(vbox)
 
-        title = Label(text="Список всех требований", size_hint=(1, None), height=40)
+        title = Label(text="Список всех требований", color=(0,0,0), size_hint=(1, None), height=40)
         vbox.add_widget(title)
 
         # Scroll + grid (GridLayout внутри ScrollView)
@@ -55,13 +56,12 @@ class AllRequirementsScreen(Screen):
         self.scroll.add_widget(self.grid)
 
         # Кнопка добавления (FAB-подобная) — по центру снизу
-        fab = Button(
+        fab = RoundButton(
             text="+",
+            font_size=40,
             size_hint=(None, None),
             size=(64, 64),
             pos_hint={'center_x': 0.5, 'y': 0.02},
-            background_normal='',
-            background_color=(0.2, 0.6, 0.95, 1),
         )
         fab.bind(on_release=self.on_add_requirement)
         root.add_widget(fab)
@@ -70,8 +70,11 @@ class AllRequirementsScreen(Screen):
         self.bind(size=self._update_cols)
         self.grid.bind(width=lambda *_: self._update_cols())
 
-        # Загрузка данных
-        Clock.schedule_once(lambda dt: self.load_requirements(), 0.01)
+    def on_pre_enter(self, *args):
+        if not self.viewmodel.is_authenticated():
+            self.manager.safe_switch("login")
+            return
+        self.load_requirements()
 
     def _update_bg(self, *args):
         self.bg.size = self.size
@@ -142,9 +145,8 @@ class AllRequirementsScreen(Screen):
         return max(100, (self.width * 0.96) / cols - 24)
 
     def open_requirement(self, requirement: RequirementsOut):
-        # открытие детального вида — заглушка, реализуй навигацию/модалку
         show_modal(f"Требование #{requirement.requirements_id}\n\n{requirement.requirements}")
+        self.manager.safe_switch("pass")
 
     def on_add_requirement(self, instance):
-        # заглушка: открой экран добавления или покажи форму
-        show_modal("Открыть форму добавления требования (реализуй сам)")
+        self.manager.safe_switch("create_requirement")

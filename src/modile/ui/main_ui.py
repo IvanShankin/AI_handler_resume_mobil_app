@@ -12,6 +12,7 @@ from src.modile.config import get_config
 from src.modile.ui.screens.auth.login import LoginScreen
 from src.modile.ui.screens.auth.register import RegisterScreen
 from src.modile.ui.screens.requirements.all_requirements import AllRequirementsScreen
+from src.modile.ui.screens.requirements.new_requirement import CreateRequirementScreen
 from src.modile.utils.event_loop import start_loop
 from src.modile.view_models.auth_vm import AuthViewModel, RegViewModel
 from src.modile.view_models.requirements import RequirementsModel
@@ -31,6 +32,10 @@ class RootScreenManager(ScreenManager):
         self.bg.size = self.size
         self.bg.pos = self.pos
 
+    def safe_switch(self, screen_name):
+        from kivy.clock import Clock
+        Clock.schedule_once(lambda dt: setattr(self, "current", screen_name))
+
 
 class AuthApp(App):
     def build(self):
@@ -49,6 +54,7 @@ class AuthApp(App):
         sm.add_widget(LoginScreen(name="login", viewmodel=AuthViewModel(auth_client=self.auth_client)))
         sm.add_widget(RegisterScreen(name="register", viewmodel=RegViewModel(auth_client=self.auth_client)))
         sm.add_widget(AllRequirementsScreen(name="all_requirements", viewmodel=RequirementsModel(req_client=self.req_client)))
+        sm.add_widget(CreateRequirementScreen(name="create_requirement", viewmodel=RequirementsModel(req_client=self.req_client)))
 
         # Запускаем глобальный event loop в отдельном потоке
         t = threading.Thread(target=start_loop, args=(conf.global_event_loop,), daemon=True)

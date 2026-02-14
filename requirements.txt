@@ -16,17 +16,16 @@ jaraco.functools==4.4.0
 keyring==25.7.0
 Kivy==2.3.1
 Kivy-Garden==0.1.5
-kivy_deps.angle==0.4.0
-kivy_deps.glew==0.3.1
-kivy_deps.sdl2==0.8.0
+kivy_deps.angle==0.4.0; sys_platform == "win32"
+kivy_deps.glew==0.3.1; sys_platform == "win32"
+kivy_deps.sdl2==0.8.0; sys_platform == "win32"
+pywin32==311; sys_platform == "win32"
+pypiwin32==223; sys_platform == "win32"
+pywin32-ctypes==0.2.3; sys_platform == "win32"
 more-itertools==10.8.0
 pydantic==2.12.5
 pydantic_core==2.41.5
 Pygments==2.19.2
-pypiwin32==223
-pysqlite3==0.6.0
-pywin32==311
-pywin32-ctypes==0.2.3
 requests==2.32.5
 typing-inspection==0.4.2
 typing_extensions==4.15.0

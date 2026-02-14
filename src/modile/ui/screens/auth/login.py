@@ -5,11 +5,10 @@ from kivy.graphics import Color, Rectangle
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
-from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import Screen
 
 from src.modile.config import get_config
-from src.modile.ui.creating_elements import create_textinput, create_button
+from src.modile.ui.elements.creating_elements import create_textinput, create_button
 from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
 from src.modile.view_models.auth_vm import AuthViewModel
 
@@ -50,22 +49,31 @@ class LoginScreen(Screen):
         self.add_widget(anchor)
 
         conf = get_config()
-        asyncio.run_coroutine_threadsafe(
+        future = asyncio.run_coroutine_threadsafe(
             self.viewmodel.check_refresh_token(),
             conf.global_event_loop
         )
-        if conf.token_storage.get_access_token():
-            self.go_to_all_requirements()
+
+        future.add_done_callback(self._on_refresh_done)
 
     def _update_bg(self, *args):
         self.bg.size = self.size
         self.bg.pos = self.pos
 
+    def _on_refresh_done(self, future):
+        try:
+            success = future.result()
+        except Exception:
+            return
+
+        if success:
+            self.go_to_all_requirements()
+
     def go_to_register(self, *args):
-        self.manager.current = "register"
+        self.manager.safe_switch("register")
 
     def go_to_all_requirements(self, *args):
-        self.manager.current = "all_requirements"
+        self.manager.safe_switch("all_requirements")
 
     def login_clicked(self, instance):
         username = self.username_input.text
@@ -84,6 +92,6 @@ class LoginScreen(Screen):
         success, result = await self.viewmodel.login(username, password)
 
         if success:
-            Clock.schedule_once(lambda dt: setattr(self.message_label, "text", "Успешный вход"))
+            self.go_to_all_requirements()
         else:
             Clock.schedule_once(lambda dt: self._show_error(f"Ошибка: {result}"))

@@ -34,3 +34,13 @@ class RequirementClient:
 
         except APIClientError as e:
             raise e
+
+    async def create_requirement(self, requirement: str) -> RequirementsOut:
+        response = await self.api.request(
+            "POST",
+            "upload/create_requirements/text",
+            json={"requirements": requirement}
+
+        )
+        data = response.json()
+        return RequirementsOut.model_validate(data)

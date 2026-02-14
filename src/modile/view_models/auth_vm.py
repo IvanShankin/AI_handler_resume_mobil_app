@@ -30,6 +30,10 @@ class AuthViewModel:
         """
         token_storage = get_config().token_storage
         refresh_token = token_storage.get_refresh_token()
+
+        if refresh_token is None:
+            return None, "Нет токена"
+
         try:
             token = await self.auth_client.refresh_token(refresh_token)
             return token, "Успешно"

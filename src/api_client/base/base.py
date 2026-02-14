@@ -2,14 +2,14 @@ from typing import Optional
 
 import httpx
 
-from src.api_client.exceptions import Unauthorized, APIClientError
+from src.api_client.exceptions import Unauthorized, APIClientError, NotFoundData
 from src.modile.config import get_config
 
 
 class BaseAPIClient:
     def __init__(self, base_url: str, timeout: float = 10.0):
         self.base_url = base_url.rstrip("/")
-        self._access_token: Optional[str] = None
+        self.config = get_config()
         self.token_manager = None
 
         self._client = httpx.AsyncClient(
@@ -17,6 +17,21 @@ class BaseAPIClient:
             timeout=timeout,
             trust_env=False
         )
+
+    def handler_status_response(self, response: httpx.Response):
+        """Пробросит ошибки соответствующие статусу"""
+        if response.status_code == 401:
+            raise Unauthorized(401, response.json(), "Unauthorized")
+        if response.status_code == 404:
+            raise NotFoundData(404, response.json(), response.text)
+
+        if response.status_code >= 400:
+            raise APIClientError(
+                status_code=response.status_code,
+                json=response.json(),
+                text=response.text
+            )
+
 
     def set_token_manager(self, manager):
         self.token_manager = manager
@@ -30,8 +45,8 @@ class BaseAPIClient:
     async def request(self, method: str, url: str, *, skip_refresh=False, **kwargs):
         headers = kwargs.pop("headers", {})
 
-        if self._access_token:
-            headers["Authorization"] = f"Bearer {self._access_token}"
+        if self.config.token_storage.get_access_token():
+            headers["Authorization"] = f"Bearer {self.config.token_storage.get_access_token()}"
 
         response = await self._client.request(
             method,
@@ -46,7 +61,7 @@ class BaseAPIClient:
                 raise Unauthorized(401, response.json(), "Unauthorized")
 
             new_token = await self.token_manager.refresh_if_needed()
-            self._access_token = new_token
+            self.config.token_storage.set_access_token(new_token)
 
             # повторяем исходный запрос
             headers["Authorization"] = f"Bearer {new_token}"
@@ -58,18 +73,10 @@ class BaseAPIClient:
                 **kwargs
             )
 
-            if retry_response.status_code == 401:
-                raise Unauthorized(401, retry_response.json(), "Unauthorized")
-
+            self.handler_status_response(retry_response)
             return retry_response
 
-        if response.status_code >= 400:
-            raise APIClientError(
-                status_code=response.status_code,
-                json=response.json(),
-                text=response.text
-            )
-
+        self.handler_status_response(response)
         return response
 
     async def close(self):

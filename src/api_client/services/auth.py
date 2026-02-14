@@ -45,6 +45,7 @@ class AuthClient:
         data = TokenResponse(**response.json())
         token_storage = get_config().token_storage
         token_storage.set_access_token(data.access_token)
+        token_storage.set_refresh_token(data.refresh_token)
         return data
 
     async def refresh_token(self, refresh_token: str) -> TokenResponse:
@@ -58,8 +59,10 @@ class AuthClient:
                 skip_refresh = True
             )
             data = TokenResponse(**response.json())
+
             token_storage = get_config().token_storage
             token_storage.set_access_token(data.access_token)
+            token_storage.set_refresh_token(data.refresh_token)
             return data
         except APIClientError as e:
             if e.status_code == 403:

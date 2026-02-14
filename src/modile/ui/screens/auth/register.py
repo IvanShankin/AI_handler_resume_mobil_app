@@ -8,7 +8,7 @@ from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 
 from src.modile.config import get_config
-from src.modile.ui.creating_elements import create_textinput, create_button
+from src.modile.ui.elements.creating_elements import create_textinput, create_button
 from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
 from src.modile.view_models.auth_vm import RegViewModel
 

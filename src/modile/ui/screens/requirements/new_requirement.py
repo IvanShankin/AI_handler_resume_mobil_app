@@ -90,8 +90,7 @@ class CreateRequirementScreen(Screen):
     async def _create_requirement(self, text: str):
         return await self.viewmodel.create_new_requirement(text)
 
-    def _on_create_do
-        ne(self, future):
+    def _on_create_done(self, future):
         try:
             future.result()
         except Exception as e:

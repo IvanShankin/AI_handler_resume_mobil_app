@@ -18,15 +18,17 @@ from src.modile.ui.elements.buttons import RoundButton
 from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
 from src.modile.ui.screens.modal_window.modal_yes_or_no import show_confirm_modal
 from src.modile.view_models.requirements import RequirementsModel
+from src.modile.view_models.resume import ResumeModel
 
 CARD_HEIGHT = 120
 
 
 class RequirementDetailScreen(Screen):
 
-    def __init__(self, viewmodel_req: RequirementsModel, **kwargs):
+    def __init__(self, viewmodel_req: RequirementsModel, viewmodel_resum: ResumeModel, **kwargs):
         super().__init__(**kwargs)
         self.viewmodel_req = viewmodel_req
+        self.viewmodel_resum = viewmodel_resum
         self.requirement_id: Optional[int] = None
         self.requirement: Optional[RequirementsOut] = None
 
@@ -153,7 +155,7 @@ class RequirementDetailScreen(Screen):
         self.requirement_id = requirement.requirements_id
 
     def on_pre_enter(self, *args):
-        if not self.viewmodel.is_authenticated():
+        if not get_config().token_storage.get_access_token():
             self.manager.safe_switch("login")
             return
 
@@ -163,7 +165,7 @@ class RequirementDetailScreen(Screen):
     def load_requirement(self):
         conf = get_config()
         fut = asyncio.run_coroutine_threadsafe(
-            self.viewmodel.get_requirements(self.requirement_id),
+            self.viewmodel_req.get_requirements(self.requirement_id),
             conf.global_event_loop
         )
         fut.add_done_callback(self._on_loaded)
@@ -193,10 +195,9 @@ class RequirementDetailScreen(Screen):
     # ===== Резюме =====
 
     def load_resumes(self):
-        return # удалить
         conf = get_config()
         fut = asyncio.run_coroutine_threadsafe(
-            self.viewmodel.get_resumes_by_requirement(self.requirement_id),
+            self.viewmodel_resum.get_resume(requirement_id=self.requirement_id),
             conf.global_event_loop
         )
         fut.add_done_callback(self._on_resumes_loaded)
@@ -205,7 +206,9 @@ class RequirementDetailScreen(Screen):
         try:
             resumes: List[ResumeOut] = fut.result()
         except Exception as e:
-            Clock.schedule_once(lambda dt: show_modal(str(e)))
+            Clock.schedule_once(
+                lambda dt, err=e: show_modal(f"Ошибка при загрузке резюме: {err}")
+            )
             return
 
         Clock.schedule_once(lambda dt: self.populate_resumes(resumes))
@@ -261,8 +264,8 @@ class RequirementDetailScreen(Screen):
         )
 
     def add_resume(self, *args):
-        return # удалить
-        self.manager.safe_switch("create_resume")
+        pass
+        # self.manager.safe_switch("create_resume")
 
     def open_resume(self, resume: ResumeOut):
         show_modal(f"Резюме #{resume.resume_id}\n\n{resume.resume}")

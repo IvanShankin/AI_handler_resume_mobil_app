@@ -8,6 +8,7 @@ from kivy.uix.screenmanager import ScreenManager, FadeTransition
 from src.api_client.base import BaseAPIClient, TokenManager
 from src.api_client.services.auth import AuthClient
 from src.api_client.services.requirements import RequirementClient
+from src.api_client.services.resume import ResumeClient
 from src.modile.config import get_config
 from src.modile.ui.screens.auth.login import LoginScreen
 from src.modile.ui.screens.auth.register import RegisterScreen
@@ -17,6 +18,7 @@ from src.modile.ui.screens.requirements.show_requirement import RequirementDetai
 from src.modile.utils.event_loop import start_loop
 from src.modile.view_models.auth_vm import AuthViewModel, RegViewModel
 from src.modile.view_models.requirements import RequirementsModel
+from src.modile.view_models.resume import ResumeModel
 
 
 class RootScreenManager(ScreenManager):
@@ -48,6 +50,7 @@ class AuthApp(App):
         self.base_client.set_token_manager(token_manager)
 
         self.req_client = RequirementClient(self.base_client)
+        self.resum_client = ResumeClient(self.base_client)
 
         sm = RootScreenManager(
             transition=FadeTransition(duration=0.15)
@@ -55,7 +58,8 @@ class AuthApp(App):
 
         self.requirements_detail = RequirementDetailScreen(
             name="requirement_detail",
-            viewmodel_req=RequirementsModel(req_client=self.req_client)
+            viewmodel_req=RequirementsModel(req_client=self.req_client),
+            viewmodel_resum=ResumeModel(self.resum_client)
         )
 
         sm.add_widget(LoginScreen(name="login", viewmodel=AuthViewModel(auth_client=self.auth_client)))

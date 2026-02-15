@@ -42,3 +42,10 @@ class InvalidCredentials(APIClientError):
 class TokenExpired(APIClientError):
     pass
 
+
+class NotEnoughArguments(Exception):
+    pass
+
+
+class ToManyArguments(Exception):
+    pass

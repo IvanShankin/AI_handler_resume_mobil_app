@@ -88,7 +88,7 @@ class AllRequirementsScreen(Screen):
         self.manager.safe_switch("login")
 
     def on_pre_enter(self, *args):
-        if not self.viewmodel.is_authenticated():
+        if not get_config().token_storage.get_access_token():
             self.manager.safe_switch("login")
             return
         self.load_requirements()

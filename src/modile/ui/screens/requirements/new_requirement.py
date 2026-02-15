@@ -28,7 +28,7 @@ class CreateRequirementScreen(Screen):
         back_btn = Button(
             text="Назад",
             size_hint=(None, None),
-            size=(50, 50),
+            size=(70, 40),
             pos_hint={"x": 0.02, "top": 0.98},
             background_normal='',
             background_color=(0.8, 0.8, 0.8, 1)
@@ -87,7 +87,7 @@ class CreateRequirementScreen(Screen):
         )
         future.add_done_callback(self._on_create_done)
 
-    async def _create_requirement(self, text: str):
+    async def _create_requirement(self, text: str) -> bool:
         return await self.viewmodel.create_new_requirement(text)
 
     def _on_create_done(self, future):

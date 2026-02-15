@@ -16,6 +16,7 @@ from src.api_client.models import RequirementsOut
 from src.modile.config import get_config
 from src.modile.ui.elements.buttons import RoundButton
 from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
+from src.modile.ui.screens.requirements.show_requirement import RequirementDetailScreen
 from src.modile.view_models.requirements import RequirementsModel
 
 MIN_CELL_WIDTH = 260  # минимальная ширина карточки (подбирай)
@@ -23,9 +24,10 @@ CARD_HEIGHT = 120     # высота карточки
 
 
 class AllRequirementsScreen(Screen):
-    def __init__(self, viewmodel: RequirementsModel, **kwargs):
+    def __init__(self, viewmodel: RequirementsModel, requirements_detail: RequirementDetailScreen, **kwargs):
         super().__init__(**kwargs)
         self.viewmodel = viewmodel
+        self.requirements_detail = requirements_detail
 
         with self.canvas.before:
             Color(0.95, 0.95, 0.95, 1)
@@ -36,11 +38,22 @@ class AllRequirementsScreen(Screen):
         root = FloatLayout()
         self.add_widget(root)
 
+        back_btn = Button(
+            text="Выйти",
+            size_hint=(None, None),
+            size=(70, 40),
+            pos_hint={"x": 0.02, "top": 0.98},
+            background_normal='',
+            background_color=(0.8, 0.8, 0.8, 1)
+        )
+        back_btn.bind(on_release=self.go_exit)
+        root.add_widget(back_btn)
+
         # Центральная вертикальная колонка (заголовок + scroll)
         container = AnchorLayout(anchor_x="center", anchor_y="top", size_hint=(1, 1))
         root.add_widget(container)
 
-        vbox = BoxLayout(orientation="vertical", spacing=10, padding=16, size_hint=(0.98, 0.98))
+        vbox = BoxLayout(orientation="vertical", spacing=10, padding=(16, 40, 16, 16), size_hint=(0.98, 0.98))
         container.add_widget(vbox)
 
         title = Label(text="Список всех требований", color=(0,0,0), size_hint=(1, None), height=40)
@@ -69,6 +82,10 @@ class AllRequirementsScreen(Screen):
         # Пересчитываем количество колонок при изменении ширины экрана / контейнера
         self.bind(size=self._update_cols)
         self.grid.bind(width=lambda *_: self._update_cols())
+
+    def go_exit(self, *args):
+        get_config().token_storage.clear_tokens()
+        self.manager.safe_switch("login")
 
     def on_pre_enter(self, *args):
         if not self.viewmodel.is_authenticated():
@@ -116,6 +133,7 @@ class AllRequirementsScreen(Screen):
         for req in requirements:
             text = (req.requirements[:120] + "…") if len(req.requirements) > 120 else req.requirements
             btn = Button(
+                color=(0,0,0),
                 text=text,
                 size_hint_y=None,
                 height=CARD_HEIGHT,
@@ -145,8 +163,8 @@ class AllRequirementsScreen(Screen):
         return max(100, (self.width * 0.96) / cols - 24)
 
     def open_requirement(self, requirement: RequirementsOut):
-        show_modal(f"Требование #{requirement.requirements_id}\n\n{requirement.requirements}")
-        self.manager.safe_switch("pass")
+        self.requirements_detail.set_requirement(requirement=requirement)
+        self.manager.safe_switch("requirement_detail")
 
     def on_add_requirement(self, instance):
         self.manager.safe_switch("create_requirement")

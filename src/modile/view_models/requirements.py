@@ -1,7 +1,6 @@
 from typing import Optional, List
 
-from pip._internal.resolution.resolvelib.base import Requirement
-
+from src.api_client.exceptions import NotFoundData
 from src.api_client.models import RequirementsOut
 from src.api_client.services.requirements import RequirementClient
 from src.modile.config import get_config
@@ -21,9 +20,16 @@ class RequirementsModel:
         except Exception as e:
             raise e
 
-    async def create_new_requirement(self, requirement: str) -> RequirementsOut:
+    async def create_new_requirement(self, requirement: str) -> bool:
         try:
-            requirements = await self.req_client.create_requirement(requirement)
-            return requirements
+            return await self.req_client.create_requirement(requirement)
+        except Exception as e:
+            raise e
+
+    async def delete_requirements(self, requirements_ids: List[int]) -> bool:
+        try:
+            return await self.req_client.delete_requirements(requirements_ids)
+        except NotFoundData as e:
+            return False
         except Exception as e:
             raise e

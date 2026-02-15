@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from src.api_client.base import BaseAPIClient
 from src.api_client.exceptions import APIClientError, NotFoundData
-from src.api_client.models import RequirementsOut
+from src.api_client.models import RequirementsOut, IsDeleteOut
 
 
 class RequirementClient:
@@ -35,12 +35,22 @@ class RequirementClient:
         except APIClientError as e:
             raise e
 
-    async def create_requirement(self, requirement: str) -> RequirementsOut:
-        response = await self.api.request(
+    async def create_requirement(self, requirement: str) -> bool:
+        await self.api.request(
             "POST",
             "upload/create_requirements/text",
             json={"requirements": requirement}
 
         )
+        return True
+
+    async def delete_requirements(self, requirements_ids: List[int]) -> bool:
+        response = await self.api.request(
+            "DELETE",
+            "upload/delete_requirements",
+            json={"requirements_ids": requirements_ids}
+
+        )
         data = response.json()
-        return RequirementsOut.model_validate(data)
+
+        return IsDeleteOut.model_validate(data).is_deleted

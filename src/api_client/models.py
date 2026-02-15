@@ -22,6 +22,16 @@ class RequirementsOut(BaseModel):
     requirements: str
 
 
+class IsDeleteOut(BaseModel):
+    is_deleted: bool
+
+
+class ResumeOut(BaseModel):
+    resume_id: int
+    user_id: int
+    resume: str
+
+
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str

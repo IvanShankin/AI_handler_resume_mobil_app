@@ -20,7 +20,9 @@ from src.modile.ui.screens.modal_window.modal_yes_or_no import show_confirm_moda
 from src.modile.view_models.requirements import RequirementsModel
 from src.modile.view_models.resume import ResumeModel
 
+MIN_CELL_WIDTH = 260
 CARD_HEIGHT = 120
+
 
 
 class RequirementDetailScreen(Screen):
@@ -73,8 +75,11 @@ class RequirementDetailScreen(Screen):
         )
         self.vbox.add_widget(self.title)
 
-        # ===== Scroll для полного требования =====
-        self.req_scroll = ScrollView(size_hint=(1, 1))
+        self.req_scroll = ScrollView(
+            size_hint=(1, None),
+            height=120  # фиксированная компактная высота
+        )
+
         self.req_label = Label(
             text="",
             size_hint_y=None,
@@ -82,13 +87,37 @@ class RequirementDetailScreen(Screen):
             valign="top",
             color=(0, 0, 0)
         )
-        # высота Label подстраивается под текст
-        self.req_label.bind(texture_size=self._update_req_height)
 
-        # ширина текста пересчитывается при ресайзе
+        self.req_label.bind(texture_size=self._update_req_height)
         self.req_scroll.bind(width=self._update_text_width)
         self.req_scroll.add_widget(self.req_label)
         self.vbox.add_widget(self.req_scroll)
+
+        # ===== Список резюме =====
+        resume_title = Label(
+            text="Резюме",
+            size_hint=(1, None),
+            height=40,
+            color=(0, 0, 0)
+        )
+        self.vbox.add_widget(resume_title)
+
+        self.resume_scroll = ScrollView(size_hint=(1, 1))
+
+        self.resume_grid = GridLayout(
+            cols=1,
+            spacing=12,
+            padding=6,
+            size_hint_y=None
+        )
+        self.resume_grid.bind(minimum_height=self.resume_grid.setter("height"))
+
+        self.resume_scroll.add_widget(self.resume_grid)
+        self.vbox.add_widget(self.resume_scroll)
+
+        # адаптивные колонки
+        self.bind(size=self._update_resume_cols)
+        self.resume_grid.bind(width=lambda *_: self._update_resume_cols())
 
         # ===== Кнопки действия =====
         action_box = BoxLayout(size_hint=(1, None), height=50, spacing=10)
@@ -112,39 +141,31 @@ class RequirementDetailScreen(Screen):
 
         self.vbox.add_widget(action_box)
 
-        # ===== Список резюме =====
-        resume_title = Label(
-            text="Резюме",
-            size_hint=(1, None),
-            height=40,
-            color=(0, 0, 0)
-        )
-        self.vbox.add_widget(resume_title)
-
-        self.resume_scroll = ScrollView(size_hint=(1, 1))
-        self.resume_grid = GridLayout(
-            cols=1,
-            spacing=10,
-            padding=5,
-            size_hint_y=None
-        )
-        self.resume_grid.bind(minimum_height=self.resume_grid.setter("height"))
-        self.resume_scroll.add_widget(self.resume_grid)
-        self.vbox.add_widget(self.resume_scroll)
-
         # ===== FAB добавить резюме =====
         fab = RoundButton(
             text="+",
             font_size=40,
             size_hint=(None, None),
-            size=(64, 64),
-            pos_hint={'center_x': 0.5, 'y': 0.02},
+            size=(50, 50),
+            pos_hint={'center_x': 0.5, 'y': 0.15},
         )
         fab.bind(on_release=self.add_resume)
         root.add_widget(fab)
 
+    def _update_resume_cols(self, *args):
+        width = self.width * 0.96
+        cols = max(1, int(width // MIN_CELL_WIDTH))
+        self.resume_grid.cols = cols
+
+        for child in list(self.resume_grid.children):
+            child.size_hint_x = 1.0 / cols
+
     def _update_req_height(self, instance, value):
         instance.height = value[1]
+
+    def _calc_resume_cell_width(self):
+        cols = max(1, self.resume_grid.cols)
+        return max(100, (self.width * 0.96) / cols - 24)
 
     def _update_text_width(self, instance, value):
         # задаём ширину текста равной ширине ScrollView минус небольшой padding
@@ -222,6 +243,7 @@ class RequirementDetailScreen(Screen):
                 if len(resume.resume) > 120
                 else resume.resume
             )
+
             btn = Button(
                 text=text,
                 size_hint_y=None,
@@ -232,8 +254,13 @@ class RequirementDetailScreen(Screen):
                 background_color=(1, 1, 1, 1),
                 color=(0, 0, 0)
             )
+
+            btn.text_size = (self._calc_resume_cell_width(), CARD_HEIGHT - 20)
             btn.bind(on_release=lambda inst, r=resume: self.open_resume(r))
+
             self.resume_grid.add_widget(btn)
+
+        self._update_resume_cols()
 
     # ===== Действия =====
 
@@ -264,8 +291,9 @@ class RequirementDetailScreen(Screen):
         )
 
     def add_resume(self, *args):
-        pass
-        # self.manager.safe_switch("create_resume")
+        screen = self.manager.get_screen("create_resume")
+        screen.set_requirement_id(self.requirement_id)
+        self.manager.safe_switch("create_resume")
 
     def open_resume(self, resume: ResumeOut):
         show_modal(f"Резюме #{resume.resume_id}\n\n{resume.resume}")

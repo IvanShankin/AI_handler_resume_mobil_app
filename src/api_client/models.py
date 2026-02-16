@@ -1,4 +1,5 @@
-from typing import Optional
+from datetime import datetime
+from typing import Optional, List
 
 from pydantic import BaseModel, EmailStr
 
@@ -30,6 +31,20 @@ class ResumeOut(BaseModel):
     resume_id: int
     user_id: int
     resume: str
+
+
+class ProcessingDetailOut(BaseModel):
+    processing_id: int
+    resume_id: int
+    requirements_id: int
+    user_id: int
+    create_at: datetime
+    score: int
+    verdict: str
+    resume: str
+    requirements: str
+    matches: List[str]
+    recommendation: str
 
 
 class TokenResponse(BaseModel):

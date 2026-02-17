@@ -36,6 +36,9 @@ class ResumeProcessingScreen(Screen):
         self.full_resume: Optional[str] = None
         self._processing_poll_event = None
         self._is_active = False
+        self._is_processing_request_in_flight = False
+        self._processing_poll_attempts = 0
+        self._max_processing_poll_attempts = 20
 
         # ===== Фон =====
         with self.canvas.before:
@@ -184,6 +187,8 @@ class ResumeProcessingScreen(Screen):
         fut.add_done_callback(self._on_processing_loaded)
 
     def _on_processing_loaded(self, fut):
+        self._is_processing_request_in_flight = False
+
         if not self._is_active:
             return
 
@@ -279,12 +284,15 @@ class ResumeProcessingScreen(Screen):
 
     def _start_processing_polling(self):
         self._stop_processing_polling()
-        self._processing_poll_event = Clock.schedule_interval(self._poll_processing_status, 1)
+        self._processing_poll_attempts = 0
+        self._processing_poll_event = Clock.schedule_interval(self._poll_processing_status, 3)
 
     def _stop_processing_polling(self):
         if self._processing_poll_event is not None:
             self._processing_poll_event.cancel()
             self._processing_poll_event = None
+        self._processing_poll_attempts = 0
+        self._is_processing_request_in_flight = False
 
     def _is_polling_active(self) -> bool:
         return self._processing_poll_event is not None
@@ -294,6 +302,17 @@ class ResumeProcessingScreen(Screen):
             self._stop_processing_polling()
             return
 
+        if self._is_processing_request_in_flight:
+            return
+
+        if self._processing_poll_attempts >= self._max_processing_poll_attempts:
+            self._stop_processing_polling()
+            self.create_processing_btn.disabled = False
+            show_modal("Достигнут лимит запросов статуса обработки. Попробуйте обновить позже.")
+            return
+
+        self._processing_poll_attempts += 1
+        self._is_processing_request_in_flight = True
         self._load_processing()
 
     def delete_processing(self, *_):

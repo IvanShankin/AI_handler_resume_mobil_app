@@ -34,6 +34,11 @@ class ResumeProcessingScreen(Screen):
         self.current_requirement_id: Optional[int] = None
         self.current_processing_id: Optional[int] = None
         self.full_resume: Optional[str] = None
+        self._processing_poll_event = None
+        self._is_active = False
+        self._is_processing_request_in_flight = False
+        self._processing_poll_attempts = 0
+        self._max_processing_poll_attempts = 20
 
         # ===== Фон =====
         with self.canvas.before:
@@ -140,6 +145,15 @@ class ResumeProcessingScreen(Screen):
         self._load_resume()
         self._load_processing()
 
+    def on_enter(self, *args):
+        self._is_active = True
+        return super().on_enter(*args)
+
+    def on_leave(self, *args):
+        self._is_active = False
+        self._stop_processing_polling()
+        return super().on_leave(*args)
+
     # LOAD DATA
 
     def _load_resume(self):
@@ -173,16 +187,22 @@ class ResumeProcessingScreen(Screen):
         fut.add_done_callback(self._on_processing_loaded)
 
     def _on_processing_loaded(self, fut):
+        self._is_processing_request_in_flight = False
+
+        if not self._is_active:
+            return
+
         try:
             processing = fut.result()
         except Exception:
-            Clock.schedule_once(lambda dt: self._no_processing())
+            Clock.schedule_once(lambda dt: self._no_processing(during_poll=self._is_polling_active()))
             return
 
         Clock.schedule_once(lambda dt: self._set_processing(processing))
 
     def _set_processing(self, processing: ProcessingDetailOut):
         self.current_processing_id = processing.processing_id
+        self._stop_processing_polling()
 
         if not processing.success:
             self.processing_label.text = (
@@ -204,9 +224,9 @@ class ResumeProcessingScreen(Screen):
         self.create_processing_btn.disabled = True
         self.delete_processing_btn.disabled = False
 
-    def _no_processing(self):
+    def _no_processing(self, during_poll: bool = False):
         self.processing_label.text = "Обработка отсутствует"
-        self.create_processing_btn.disabled = False
+        self.create_processing_btn.disabled = during_poll
         self.delete_processing_btn.disabled = True
 
     # ACTIONS
@@ -240,9 +260,60 @@ class ResumeProcessingScreen(Screen):
             ),
             conf.global_event_loop
         )
-        fut.add_done_callback(lambda f: Clock.schedule_once(
-            lambda dt: show_modal("Обработка запущена, в скором времени данные появятся на данной форме")
-        ))
+        fut.add_done_callback(self._on_processing_created)
+
+    def _on_processing_created(self, fut):
+        try:
+            created = fut.result()
+        except Exception as e:
+            Clock.schedule_once(lambda dt, err=e: show_modal(f"Ошибка запуска обработки: {err}"))
+            return
+
+        if not created:
+            Clock.schedule_once(lambda dt: show_modal("Не удалось запустить обработку"))
+            return
+
+        def _show_and_start(_):
+            if not self._is_active:
+                return
+            self.create_processing_btn.disabled = True
+            show_modal("Обработка запущена, в скором времени данные появятся на данной форме")
+            self._start_processing_polling()
+
+        Clock.schedule_once(_show_and_start)
+
+    def _start_processing_polling(self):
+        self._stop_processing_polling()
+        self._processing_poll_attempts = 0
+        self._processing_poll_event = Clock.schedule_interval(self._poll_processing_status, 3)
+
+    def _stop_processing_polling(self):
+        if self._processing_poll_event is not None:
+            self._processing_poll_event.cancel()
+            self._processing_poll_event = None
+        self._processing_poll_attempts = 0
+        self._is_processing_request_in_flight = False
+
+    def _is_polling_active(self) -> bool:
+        return self._processing_poll_event is not None
+
+    def _poll_processing_status(self, _dt):
+        if not self._is_active or not self.current_resume_id:
+            self._stop_processing_polling()
+            return
+
+        if self._is_processing_request_in_flight:
+            return
+
+        if self._processing_poll_attempts >= self._max_processing_poll_attempts:
+            self._stop_processing_polling()
+            self.create_processing_btn.disabled = False
+            show_modal("Достигнут лимит запросов статуса обработки. Попробуйте обновить позже.")
+            return
+
+        self._processing_poll_attempts += 1
+        self._is_processing_request_in_flight = True
+        self._load_processing()
 
     def delete_processing(self, *_):
         if not self.current_processing_id:

@@ -14,8 +14,8 @@ class ResumeModel:
         requirement_id: Optional[int] = None,
         resume_id: Optional[int] = None
     ) -> List[ResumeOut]:
-        requirements = await self.resum_client.get_resume(requirement_id=requirement_id, resume_id=resume_id)
-        return requirements
+        resume = await self.resum_client.get_resume(requirement_id=requirement_id, resume_id=resume_id)
+        return resume
 
     async def create_resume(self, requirements_id: int, resume: str) -> bool:
         try:

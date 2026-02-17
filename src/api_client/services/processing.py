@@ -31,13 +31,16 @@ class ProcessingClient:
         return ProcessingDetailOut.model_validate(data)
 
 
-    async def start_processing(self, requirement: str) -> bool:
-        pass
-        # await self.api.request(
-        #     "POST",
-        #     "upload/start_processing",
-        #     json={"requirements": requirement}
-        # )
+    async def start_processing(self, requirement_id: int, resume_id: int) -> bool:
+        await self.api.request(
+            "POST",
+            "upload/start_processing",
+            json={
+                "requirements_id": requirement_id,
+                "resume_id": resume_id,
+            }
+        )
+        return True
 
     async def delete_processing(self, processing_ids: List[int]) -> bool:
         response = await self.api.request(

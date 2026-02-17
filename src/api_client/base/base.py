@@ -4,6 +4,7 @@ import httpx
 
 from src.api_client.exceptions import Unauthorized, APIClientError, NotFoundData
 from src.modile.config import get_config
+from src.modile.utils.core_logger import get_logger
 
 
 class BaseAPIClient:
@@ -20,6 +21,9 @@ class BaseAPIClient:
 
     def handler_status_response(self, response: httpx.Response):
         """Пробросит ошибки соответствующие статусу"""
+        get_logger(__name__).warning(
+            f"Ответ сервера.\nstatus_code = {response.status_code}\njson = {response.json()}"
+        )
         if response.status_code == 401:
             raise Unauthorized(401, response.json(), "Unauthorized")
         if response.status_code == 404:
@@ -56,6 +60,7 @@ class BaseAPIClient:
         )
 
         if response.status_code == 401 and not skip_refresh:
+            get_logger(__name__).info("Access токен устарел, обновляем его")
             # пробуем обновить токен
             if not self.token_manager:
                 raise Unauthorized(401, response.json(), "Unauthorized")

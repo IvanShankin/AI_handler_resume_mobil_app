@@ -32,9 +32,6 @@ class RequirementClient:
         except NotFoundData:
             return []
 
-        except APIClientError as e:
-            raise e
-
     async def create_requirement(self, requirement: str) -> bool:
         await self.api.request(
             "POST",

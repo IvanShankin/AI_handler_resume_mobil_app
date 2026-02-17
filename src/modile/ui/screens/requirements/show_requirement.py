@@ -17,6 +17,7 @@ from src.modile.config import get_config
 from src.modile.ui.elements.buttons import RoundButton
 from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
 from src.modile.ui.screens.modal_window.modal_yes_or_no import show_confirm_modal
+from src.modile.ui.screens.resume.show_resume_processing import ResumeProcessingScreen
 from src.modile.view_models.requirements import RequirementsModel
 from src.modile.view_models.resume import ResumeModel
 
@@ -27,10 +28,19 @@ CARD_HEIGHT = 120
 
 class RequirementDetailScreen(Screen):
 
-    def __init__(self, viewmodel_req: RequirementsModel, viewmodel_resum: ResumeModel, **kwargs):
+    def __init__(
+        self,
+        resume_screen: ResumeProcessingScreen,
+        viewmodel_req: RequirementsModel,
+        viewmodel_resum: ResumeModel,
+        **kwargs
+    ):
         super().__init__(**kwargs)
+        self.resume_screen = resume_screen
+
         self.viewmodel_req = viewmodel_req
         self.viewmodel_resum = viewmodel_resum
+
         self.requirement_id: Optional[int] = None
         self.requirement: Optional[RequirementsOut] = None
 
@@ -272,7 +282,7 @@ class RequirementDetailScreen(Screen):
         conf = get_config()
         def delete():
             fut = asyncio.run_coroutine_threadsafe(
-                self.viewmodel.delete_requirements([self.requirement_id]),
+                self.viewmodel_req.delete_requirements([self.requirement_id]),
                 conf.global_event_loop
             )
             if fut.result():
@@ -296,7 +306,12 @@ class RequirementDetailScreen(Screen):
         self.manager.safe_switch("create_resume")
 
     def open_resume(self, resume: ResumeOut):
-        show_modal(f"Резюме #{resume.resume_id}\n\n{resume.resume}")
+        self.manager.safe_switch("show_resume_processing")
+        self.resume_screen.load(
+            requirement_id=self.requirement_id,
+            resume_id=resume.resume_id,
+            full_resume=resume.resume
+        )
 
     def go_back(self, *args):
         self.manager.safe_switch("all_requirements")

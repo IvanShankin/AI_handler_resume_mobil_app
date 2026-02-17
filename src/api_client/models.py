@@ -38,13 +38,18 @@ class ProcessingDetailOut(BaseModel):
     resume_id: int
     requirements_id: int
     user_id: int
-    create_at: datetime
+
+    success: bool
+    message_error: str # только при success == False
+    wait_seconds: int # только при success == False
+
     score: int
     verdict: str
     resume: str
     requirements: str
     matches: List[str]
     recommendation: str
+    create_at: datetime
 
 
 class TokenResponse(BaseModel):

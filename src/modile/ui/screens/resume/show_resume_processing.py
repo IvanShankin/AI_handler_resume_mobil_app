@@ -10,6 +10,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 
+from src.api_client.models import ProcessingDetailOut
 from src.modile.config import get_config
 from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
 from src.modile.ui.screens.modal_window.modal_yes_or_no import show_confirm_modal
@@ -180,9 +181,24 @@ class ResumeProcessingScreen(Screen):
 
         Clock.schedule_once(lambda dt: self._set_processing(processing))
 
-    def _set_processing(self, processing):
+    def _set_processing(self, processing: ProcessingDetailOut):
         self.current_processing_id = processing.processing_id
-        self.processing_label.text = processing.result_text
+
+        if not processing.success:
+            self.processing_label.text = (
+                "Обработка завершилась с ошибкой.\n\n"
+                f"Причина: {processing.message_error}\n"
+                f"Попробуйте снова через {processing.wait_seconds} сек."
+            )
+        else:
+            matches = "\n".join(f"• {item}" for item in processing.matches)
+            self.processing_label.text = (
+                "Результат обработки:\n\n"
+                f"Оценка: {processing.score}\n"
+                f"Вердикт: {processing.verdict}\n\n"
+                f"Совпадения:\n{matches}\n\n"
+                f"Рекомендация:\n{processing.recommendation}"
+            )
         self.processing_label.text_size = (self.width * 0.9, None)
 
         self.create_processing_btn.disabled = True

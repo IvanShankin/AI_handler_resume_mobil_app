@@ -2,7 +2,7 @@ import asyncio
 from typing import Optional
 
 from kivy.clock import Clock
-from kivy.graphics import Color, Rectangle
+from kivy.graphics import Color, Rectangle, RoundedRectangle
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
@@ -17,6 +17,13 @@ from src.modile.ui.screens.modal_window.modal_yes_or_no import show_confirm_moda
 from src.modile.utils.core_logger import get_logger
 from src.modile.view_models.resume import ResumeModel
 from src.modile.view_models.processing import ProcessingModel
+
+BG_COLOR = (0.96, 0.96, 0.97, 1)
+PANEL_COLOR = (0.985, 0.985, 0.99, 1)
+TEXT_COLOR = (0.14, 0.14, 0.16, 1)
+BTN_NEUTRAL_BG = (0.22, 0.22, 0.24, 1)
+BTN_PRIMARY_BG = (0.28, 0.28, 0.31, 1)
+BTN_DANGER_BG = (0.4, 0.4, 0.43, 1)
 
 
 class ResumeProcessingScreen(Screen):
@@ -43,93 +50,122 @@ class ResumeProcessingScreen(Screen):
         self._processing_poll_attempts = 0
         self._max_processing_poll_attempts = 20
 
-        # ===== Фон =====
         with self.canvas.before:
-            Color(0.95, 0.95, 0.95, 1)
+            Color(*BG_COLOR)
             self.bg = Rectangle(size=self.size, pos=self.pos)
         self.bind(size=self._update_bg, pos=self._update_bg)
 
         root = FloatLayout()
         self.add_widget(root)
 
-        # ===== Назад =====
         back_btn = Button(
             text="Назад",
             size_hint=(None, None),
-            size=(80, 40),
-            pos_hint={"x": 0.02, "top": 0.98},
+            size=(92, 42),
+            pos_hint={"x": 0.03, "top": 0.965},
             background_normal='',
-            background_color=(0.8, 0.8, 0.8, 1)
+            background_color=BTN_NEUTRAL_BG,
+            color=(1, 1, 1, 1),
+            bold=True,
         )
         back_btn.bind(on_release=lambda *_: self.manager.safe_switch("requirement_detail"))
         root.add_widget(back_btn)
 
-        # ===== Основной контейнер =====
         self.vbox = BoxLayout(
             orientation="vertical",
-            spacing=15,
-            padding=[20, 70, 20, 20],
-            size_hint=(1, 1)
+            spacing=14,
+            padding=[24, 78, 24, 24],
+            size_hint=(0.96, 0.96),
+            pos_hint={"center_x": 0.5, "center_y": 0.5},
         )
         root.add_widget(self.vbox)
 
-        # ===== Блок РЕЗЮМЕ =====
-        self.resume_scroll = ScrollView(
-            size_hint=(1, 0.2),
+        with self.vbox.canvas.before:
+            Color(*PANEL_COLOR)
+            self.panel_bg = RoundedRectangle(pos=self.vbox.pos, size=self.vbox.size, radius=[18])
+        self.vbox.bind(pos=self._update_panel_bg, size=self._update_panel_bg)
+
+        self.resume_title = Label(
+            text="Резюме",
+            size_hint=(1, None),
+            height=28,
+            color=TEXT_COLOR,
+            font_size=18,
+            bold=True,
         )
+        self.vbox.add_widget(self.resume_title)
+
+        self.resume_scroll = ScrollView(size_hint=(1, 0.24), bar_color=(0.5, 0.5, 0.55, 0.7), bar_inactive_color=(0.75, 0.75, 0.78, 0.3))
         self.resume_label = Label(
             text="",
             size_hint_y=None,
             halign="left",
             valign="top",
-            color=(0, 0, 0)
+            color=TEXT_COLOR,
+            font_size=16,
         )
         self.resume_label.bind(texture_size=self._update_resume_height)
         self.resume_scroll.add_widget(self.resume_label)
-
         self.vbox.add_widget(self.resume_scroll)
 
-        # ===== Блок ОБРАБОТКИ =====
-        self.processing_scroll = ScrollView(size_hint=(1, 0.4))
+        self.processing_title = Label(
+            text="Обработка",
+            size_hint=(1, None),
+            height=28,
+            color=TEXT_COLOR,
+            font_size=18,
+            bold=True,
+        )
+        self.vbox.add_widget(self.processing_title)
+
+        self.processing_scroll = ScrollView(size_hint=(1, 0.42), bar_color=(0.5, 0.5, 0.55, 0.7), bar_inactive_color=(0.75, 0.75, 0.78, 0.3))
         self.processing_label = Label(
             text="",
             size_hint_y=None,
             halign="left",
             valign="top",
-            color=(0, 0, 0)
+            color=TEXT_COLOR,
+            font_size=16,
         )
         self.processing_label.bind(texture_size=self._update_processing_height)
         self.processing_scroll.add_widget(self.processing_label)
 
         self.vbox.add_widget(self.processing_scroll)
 
-        # ===== Кнопки для обработки =====
-        self.processing_actions = BoxLayout(size_hint=(1, None), height=45, spacing=10)
+        self.processing_actions = BoxLayout(size_hint=(1, None), height=48, spacing=10)
         self.show_resume_btn = Button(
             text="Просмотреть резюме",
             background_normal='',
-            background_color=(0.3, 0.6, 0.95, 1)
+            background_color=BTN_PRIMARY_BG,
+            color=(1, 1, 1, 1),
+            bold=True,
         )
         self.show_resume_btn.bind(on_release=self.show_full_resume)
 
         self.create_processing_btn = Button(
             text="Создать обработку",
             background_normal='',
-            background_color=(0.3, 0.6, 0.95, 1)
+            background_color=BTN_PRIMARY_BG,
+            color=(1, 1, 1, 1),
+            bold=True,
         )
         self.create_processing_btn.bind(on_release=self.create_processing)
 
         self.delete_processing_btn = Button(
             text="Удалить обработку",
             background_normal='',
-            background_color=(0.9, 0.3, 0.3, 1)
+            background_color=BTN_DANGER_BG,
+            color=(1, 1, 1, 1),
+            bold=True,
         )
         self.delete_processing_btn.bind(on_release=self.delete_processing)
 
         self.delete_resume_btn = Button(
             text="Удалить резюме",
             background_normal='',
-            background_color=(0.9, 0.3, 0.3, 1)
+            background_color=BTN_DANGER_BG,
+            color=(1, 1, 1, 1),
+            bold=True,
         )
         self.delete_resume_btn.bind(on_release=self.delete_resume)
 
@@ -139,7 +175,19 @@ class ResumeProcessingScreen(Screen):
         self.processing_actions.add_widget(self.delete_processing_btn)
         self.vbox.add_widget(self.processing_actions)
 
-    # PUBLIC API
+    def _update_panel_bg(self, instance, *_):
+        self.panel_bg.pos = instance.pos
+        self.panel_bg.size = instance.size
+
+    def _update_bg(self, *args):
+        self.bg.size = self.size
+        self.bg.pos = self.pos
+
+    def _update_resume_height(self, instance, value):
+        instance.height = value[1]
+
+    def _update_processing_height(self, instance, value):
+        instance.height = value[1]
 
     def load(self, requirement_id: int, resume_id: int, full_resume: str):
         self._is_active = True
@@ -157,8 +205,6 @@ class ResumeProcessingScreen(Screen):
         self._is_active = False
         self._stop_processing_polling()
         return super().on_leave(*args)
-
-    # LOAD DATA
 
     def _load_resume(self):
         conf = get_config()
@@ -198,7 +244,7 @@ class ResumeProcessingScreen(Screen):
 
         try:
             processing = fut.result()
-        except Exception as e:
+        except Exception:
             get_logger(__name__).exception("Ошибка при загрузке processing")
             Clock.schedule_once(lambda dt: self._no_processing(during_poll=self._is_polling_active()))
             return
@@ -233,8 +279,6 @@ class ResumeProcessingScreen(Screen):
         self.processing_label.text = "Обработка отсутствует"
         self.create_processing_btn.disabled = during_poll
         self.delete_processing_btn.disabled = True
-
-    # ACTIONS
 
     def show_full_resume(self, *args):
         if self.full_resume:
@@ -338,15 +382,3 @@ class ResumeProcessingScreen(Screen):
         fut.add_done_callback(lambda f: Clock.schedule_once(
             lambda dt: self._no_processing()
         ))
-
-    # UI UTILS
-
-    def _update_bg(self, *args):
-        self.bg.size = self.size
-        self.bg.pos = self.pos
-
-    def _update_resume_height(self, instance, size):
-        self.resume_label.height = self.resume_label.texture_size[1]
-
-    def _update_processing_height(self, instance, size):
-        self.processing_label.height = self.processing_label.texture_size[1]

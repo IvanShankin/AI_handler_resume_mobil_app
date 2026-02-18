@@ -29,7 +29,7 @@ PANEL_COLOR = (0.985, 0.985, 0.99, 1)
 CARD_COLOR = (1, 1, 1, 1)
 TEXT_COLOR = (0.14, 0.14, 0.16, 1)
 SUBTLE_TEXT = (0.35, 0.35, 0.38, 1)
-BTN_NEUTRAL_BG = (0.22, 0.22, 0.24, 1)
+BTN_NEUTRAL_BG = (0.9, 0.9, 0.9, 1)
 BTN_PRIMARY_BG = (0.28, 0.28, 0.31, 1)
 BTN_DANGER_BG = (0.4, 0.4, 0.43, 1)
 FAB_BG = (0.2, 0.2, 0.22, 1)
@@ -61,6 +61,14 @@ class RequirementDetailScreen(Screen):
         root = FloatLayout()
         self.add_widget(root)
 
+        container = AnchorLayout(anchor_x="center", anchor_y="top", padding=(16, 22, 16, 16))
+        root.add_widget(container)
+
+        with container.canvas.before:
+            Color(*PANEL_COLOR)
+            self.panel_bg = RoundedRectangle(pos=container.pos, size=container.size, radius=[18])
+        container.bind(pos=self._update_panel_bg, size=self._update_panel_bg)
+
         back_btn = Button(
             text="Назад",
             size_hint=(None, None),
@@ -73,14 +81,6 @@ class RequirementDetailScreen(Screen):
         )
         back_btn.bind(on_release=self.go_back)
         root.add_widget(back_btn)
-
-        container = AnchorLayout(anchor_x="center", anchor_y="top", padding=(16, 22, 16, 16))
-        root.add_widget(container)
-
-        with container.canvas.before:
-            Color(*PANEL_COLOR)
-            self.panel_bg = RoundedRectangle(pos=container.pos, size=container.size, radius=[18])
-        container.bind(pos=self._update_panel_bg, size=self._update_panel_bg)
 
         self.vbox = BoxLayout(
             orientation="vertical",

@@ -21,7 +21,7 @@ from src.modile.view_models.processing import ProcessingModel
 BG_COLOR = (0.96, 0.96, 0.97, 1)
 PANEL_COLOR = (0.985, 0.985, 0.99, 1)
 TEXT_COLOR = (0.14, 0.14, 0.16, 1)
-BTN_NEUTRAL_BG = (0.22, 0.22, 0.24, 1)
+BTN_NEUTRAL_BG = (0.9, 0.9, 0.9, 1)
 BTN_PRIMARY_BG = (0.28, 0.28, 0.31, 1)
 BTN_DANGER_BG = (0.4, 0.4, 0.43, 1)
 
@@ -58,19 +58,6 @@ class ResumeProcessingScreen(Screen):
         root = FloatLayout()
         self.add_widget(root)
 
-        back_btn = Button(
-            text="Назад",
-            size_hint=(None, None),
-            size=(92, 42),
-            pos_hint={"x": 0.03, "top": 0.965},
-            background_normal='',
-            background_color=BTN_NEUTRAL_BG,
-            color=(1, 1, 1, 1),
-            bold=True,
-        )
-        back_btn.bind(on_release=lambda *_: self.manager.safe_switch("requirement_detail"))
-        root.add_widget(back_btn)
-
         self.vbox = BoxLayout(
             orientation="vertical",
             spacing=14,
@@ -84,6 +71,19 @@ class ResumeProcessingScreen(Screen):
             Color(*PANEL_COLOR)
             self.panel_bg = RoundedRectangle(pos=self.vbox.pos, size=self.vbox.size, radius=[18])
         self.vbox.bind(pos=self._update_panel_bg, size=self._update_panel_bg)
+
+        back_btn = Button(
+            text="Назад",
+            size_hint=(None, None),
+            size=(92, 42),
+            pos_hint={"x": 0.03, "top": 0.965},
+            background_normal='',
+            background_color=BTN_NEUTRAL_BG,
+            color=(1, 1, 1, 1),
+            bold=True,
+        )
+        back_btn.bind(on_release=lambda *_: self.manager.safe_switch("requirement_detail"))
+        root.add_widget(back_btn)
 
         self.resume_title = Label(
             text="Резюме",

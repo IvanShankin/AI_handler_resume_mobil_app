@@ -16,7 +16,7 @@ BG_COLOR = (0.96, 0.96, 0.97, 1)
 PANEL_COLOR = (0.985, 0.985, 0.99, 1)
 TEXT_COLOR = (0.14, 0.14, 0.16, 1)
 SUBTLE_COLOR = (0.35, 0.35, 0.38, 1)
-BTN_NEUTRAL_BG = (0.22, 0.22, 0.24, 1)
+BTN_NEUTRAL_BG = (0.9, 0.9, 0.9, 1)
 BTN_PRIMARY_BG = (0.28, 0.28, 0.31, 1)
 
 
@@ -33,19 +33,6 @@ class CreateRequirementScreen(Screen):
         root = FloatLayout()
         self.add_widget(root)
 
-        back_btn = Button(
-            text="Назад",
-            size_hint=(None, None),
-            size=(92, 42),
-            pos_hint={"x": 0.03, "top": 0.965},
-            background_normal='',
-            background_color=BTN_NEUTRAL_BG,
-            color=(1, 1, 1, 1),
-            bold=True,
-        )
-        back_btn.bind(on_release=self.go_back)
-        root.add_widget(back_btn)
-
         panel = BoxLayout(
             orientation="vertical",
             spacing=14,
@@ -59,6 +46,19 @@ class CreateRequirementScreen(Screen):
             Color(*PANEL_COLOR)
             self.panel_bg = RoundedRectangle(pos=panel.pos, size=panel.size, radius=[18])
         panel.bind(pos=self._update_panel_bg, size=self._update_panel_bg)
+
+        back_btn = Button(
+            text="Назад",
+            size_hint=(None, None),
+            size=(92, 42),
+            pos_hint={"x": 0.03, "top": 0.965},
+            background_normal='',
+            background_color=BTN_NEUTRAL_BG,
+            color=(1, 1, 1, 1),
+            bold=True,
+        )
+        back_btn.bind(on_release=self.go_back)
+        root.add_widget(back_btn)
 
         title = Label(
             text="Новое требование",

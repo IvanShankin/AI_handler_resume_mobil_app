@@ -27,7 +27,7 @@ PANEL_COLOR = (0.985, 0.985, 0.99, 1)
 CARD_COLOR = (1, 1, 1, 1)
 TEXT_COLOR = (0.14, 0.14, 0.16, 1)
 SUBTLE_TEXT_COLOR = (0.35, 0.35, 0.38, 1)
-BTN_NEUTRAL_BG = (0.22, 0.22, 0.24, 1)
+BTN_NEUTRAL_BG = (2.2, 2.2, 2.2, 1)
 FAB_BG = (0.2, 0.2, 0.22, 1)
 
 
@@ -45,19 +45,6 @@ class AllRequirementsScreen(Screen):
         root = FloatLayout()
         self.add_widget(root)
 
-        back_btn = Button(
-            text="Выйти",
-            size_hint=(None, None),
-            size=(92, 42),
-            pos_hint={"x": 0.03, "top": 0.965},
-            background_normal='',
-            background_color=BTN_NEUTRAL_BG,
-            color=(1, 1, 1, 1),
-            bold=True,
-        )
-        back_btn.bind(on_release=self.go_exit)
-        root.add_widget(back_btn)
-
         container = AnchorLayout(anchor_x="center", anchor_y="top", size_hint=(1, 1), padding=(16, 22, 16, 16))
         root.add_widget(container)
 
@@ -68,6 +55,18 @@ class AllRequirementsScreen(Screen):
 
         vbox = BoxLayout(orientation="vertical", spacing=14, padding=(18, 52, 18, 18), size_hint=(0.99, 0.99))
         container.add_widget(vbox)
+
+        back_btn = Button(
+            text="Выйти",
+            size_hint=(None, None),
+            size=(92, 42),
+            pos_hint={"x": 0.03, "top": 0.965},
+            background_color=BTN_NEUTRAL_BG,
+            color=(1, 1, 1, 1),
+            bold=True,
+        )
+        back_btn.bind(on_release=self.go_exit)
+        root.add_widget(back_btn)
 
         title = Label(
             text="Список всех требований",

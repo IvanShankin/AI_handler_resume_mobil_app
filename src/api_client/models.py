@@ -40,15 +40,15 @@ class ProcessingDetailOut(BaseModel):
     user_id: int
 
     success: bool
-    message_error: str # только при success == False
-    wait_seconds: int # только при success == False
+    message_error: Optional[str] = None # только при success == False
+    wait_seconds: Optional[int] = None # только при success == False
 
-    score: int
-    verdict: str
-    resume: str
-    requirements: str
-    matches: List[str]
-    recommendation: str
+    score: Optional[int] = None
+    verdict: Optional[str] = None
+    resume: Optional[str] = None
+    requirements: Optional[str] = None
+    matches: Optional[List[str]] = None
+    recommendation: Optional[str] = None
     create_at: datetime
 
 

@@ -75,6 +75,11 @@ class CreateRequirementScreen(Screen):
 
     def add_requirement(self, *args):
         text = self.input_field.text.strip()
+        max_char = get_config().max_char_requirements
+
+        if len(text) > max_char:
+            show_modal(f"Слишком длинное требование. \n\nМаксимальная длинна символов у требования: {max_char}")
+            return
 
         if not text:
             show_modal("Поле не может быть пустым")

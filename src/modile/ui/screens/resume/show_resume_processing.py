@@ -14,6 +14,7 @@ from src.api_client.models import ProcessingDetailOut
 from src.modile.config import get_config
 from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
 from src.modile.ui.screens.modal_window.modal_yes_or_no import show_confirm_modal
+from src.modile.utils.core_logger import get_logger
 from src.modile.view_models.resume import ResumeModel
 from src.modile.view_models.processing import ProcessingModel
 
@@ -33,7 +34,9 @@ class ResumeProcessingScreen(Screen):
         self.current_resume_id: Optional[int] = None
         self.current_requirement_id: Optional[int] = None
         self.current_processing_id: Optional[int] = None
+
         self.full_resume: Optional[str] = None
+
         self._processing_poll_event = None
         self._is_active = False
         self._is_processing_request_in_flight = False
@@ -139,6 +142,7 @@ class ResumeProcessingScreen(Screen):
     # PUBLIC API
 
     def load(self, requirement_id: int, resume_id: int, full_resume: str):
+        self._is_active = True
         self.current_requirement_id = requirement_id
         self.current_resume_id = resume_id
         self.full_resume = full_resume
@@ -194,7 +198,8 @@ class ResumeProcessingScreen(Screen):
 
         try:
             processing = fut.result()
-        except Exception:
+        except Exception as e:
+            get_logger(__name__).exception("Ошибка при загрузке processing")
             Clock.schedule_once(lambda dt: self._no_processing(during_poll=self._is_polling_active()))
             return
 

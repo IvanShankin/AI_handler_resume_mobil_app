@@ -208,7 +208,9 @@ class RequirementDetailScreen(Screen):
                 raise ValueError("Требование не найдено")
             requirement = data[0]
         except Exception as e:
-            Clock.schedule_once(lambda dt: show_modal(str(e)))
+            Clock.schedule_once(
+                lambda dt, err=e: show_modal(f"Ошибка: {str(err)}")
+            )
             return
 
         Clock.schedule_once(lambda dt: self.populate_requirement(requirement))

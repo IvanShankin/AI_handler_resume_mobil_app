@@ -21,7 +21,7 @@ class BaseAPIClient:
 
     def handler_status_response(self, response: httpx.Response):
         """Пробросит ошибки соответствующие статусу"""
-        get_logger(__name__).warning(
+        get_logger(__name__).info(
             f"Ответ сервера.\nstatus_code = {response.status_code}\njson = {response.json()}"
         )
         if response.status_code == 401:

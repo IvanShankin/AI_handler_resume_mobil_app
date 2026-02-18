@@ -90,6 +90,12 @@ class CreateResumeScreen(Screen):
             show_modal("Поле не может быть пустым")
             return
 
+        max_char = get_config().max_char_resume
+
+        if len(text) > max_char:
+            show_modal(f"Слишком длинное резюме. \n\nМаксимальная длинна символов у резюме: {max_char}")
+            return
+
         if not self.requirement_id:
             show_modal("Не указан requirement_id")
             return

@@ -13,12 +13,12 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 
 from src.api_client.schemas import ProcessingOut
-from src.modile.config import get_config
-from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
-from src.modile.ui.screens.modal_window.modal_yes_or_no import show_confirm_modal
-from src.modile.utils.core_logger import get_logger
-from src.modile.view_models.resume import ResumeModel
-from src.modile.view_models.processing import ProcessingModel
+from src.mobile.config import get_config
+from src.mobile.ui.screens.modal_window.modal_with_ok import show_modal
+from src.mobile.ui.screens.modal_window.modal_yes_or_no import show_confirm_modal
+from src.mobile.utils.core_logger import get_logger
+from src.mobile.view_models.resume import ResumeModel
+from src.mobile.view_models.processing import ProcessingModel
 
 BG_COLOR = (0.92, 0.92, 0.92, 1)
 PANEL_COLOR = (0.92, 0.92, 0.92, 1)

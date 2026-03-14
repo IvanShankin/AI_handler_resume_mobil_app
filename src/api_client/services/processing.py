@@ -22,7 +22,7 @@ class ProcessingClient:
 
         data = response.json()
 
-        return ProcessingOut.model_validate(data)
+        return ProcessingOut.parse_obj(data)
 
 
     async def start_processing(self, requirement_id: int, resume_id: int) -> bool:
@@ -45,4 +45,4 @@ class ProcessingClient:
         )
         data = response.json()
 
-        return bool(DeleteProcessingResponse.model_validate(data))
+        return bool(DeleteProcessingResponse.parse_obj(data))

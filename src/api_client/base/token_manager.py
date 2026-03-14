@@ -1,7 +1,7 @@
 import asyncio
 
 from src.api_client.exceptions import Unauthorized
-from src.modile.config import get_config
+from src.mobile.config import get_config
 
 
 class TokenManager:

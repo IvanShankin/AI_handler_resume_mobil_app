@@ -10,19 +10,19 @@ from src.api_client.services.auth import AuthClient
 from src.api_client.services.processing import ProcessingClient
 from src.api_client.services.requirements import RequirementClient
 from src.api_client.services.resume import ResumeClient
-from src.modile.config import get_config
-from src.modile.ui.screens.auth.login import LoginScreen
-from src.modile.ui.screens.auth.register import RegisterScreen
-from src.modile.ui.screens.requirements.all_requirements import AllRequirementsScreen
-from src.modile.ui.screens.requirements.new_requirement import CreateRequirementScreen
-from src.modile.ui.screens.requirements.show_requirement import RequirementDetailScreen
-from src.modile.ui.screens.resume.new_resume import CreateResumeScreen
-from src.modile.ui.screens.resume.show_resume_processing import ResumeProcessingScreen
-from src.modile.utils.event_loop import start_loop
-from src.modile.view_models.auth_vm import AuthViewModel, RegViewModel
-from src.modile.view_models.processing import ProcessingModel
-from src.modile.view_models.requirements import RequirementsModel
-from src.modile.view_models.resume import ResumeModel
+from src.mobile.config import get_config
+from src.mobile.ui.screens.auth.login import LoginScreen
+from src.mobile.ui.screens.auth.register import RegisterScreen
+from src.mobile.ui.screens.requirements.all_requirements import AllRequirementsScreen
+from src.mobile.ui.screens.requirements.new_requirement import CreateRequirementScreen
+from src.mobile.ui.screens.requirements.show_requirement import RequirementDetailScreen
+from src.mobile.ui.screens.resume.new_resume import CreateResumeScreen
+from src.mobile.ui.screens.resume.show_resume_processing import ResumeProcessingScreen
+from src.mobile.utils.event_loop import start_loop
+from src.mobile.view_models.auth_vm import AuthViewModel, RegViewModel
+from src.mobile.view_models.processing import ProcessingModel
+from src.mobile.view_models.requirements import RequirementsModel
+from src.mobile.view_models.resume import ResumeModel
 
 
 class RootScreenManager(ScreenManager):

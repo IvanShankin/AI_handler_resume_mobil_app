@@ -36,7 +36,7 @@ class ResumeClient:
 
             response = await self.api.request("GET", url, params=params)
             data = response.json()
-            return [ResumeOut.model_validate(item) for item in data] if in_json_list else [ResumeOut.model_validate(data)]
+            return [ResumeOut.parse_obj(item) for item in data] if in_json_list else [ResumeOut.parse_obj(data)]
 
         except NotFoundData:
             return []

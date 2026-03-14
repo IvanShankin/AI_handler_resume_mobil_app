@@ -7,10 +7,10 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 
-from src.modile.config import get_config
-from src.modile.ui.elements.creating_elements import create_textinput, create_button
-from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
-from src.modile.view_models.auth_vm import RegViewModel
+from src.mobile.config import get_config
+from src.mobile.ui.elements.creating_elements import create_textinput, create_button
+from src.mobile.ui.screens.modal_window.modal_with_ok import show_modal
+from src.mobile.view_models.auth_vm import RegViewModel
 
 
 class RegisterScreen(Screen):

@@ -8,9 +8,9 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 
-from src.modile.config import get_config
-from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
-from src.modile.view_models.resume import ResumeModel
+from src.mobile.config import get_config
+from src.mobile.ui.screens.modal_window.modal_with_ok import show_modal
+from src.mobile.view_models.resume import ResumeModel
 
 BG_COLOR = (0.92, 0.92, 0.92, 1)
 PANEL_COLOR = (0.92, 0.92, 0.92, 1)

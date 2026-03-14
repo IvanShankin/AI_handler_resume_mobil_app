@@ -5,7 +5,7 @@ from pydantic import ValidationError
 from src.api_client.services.auth import AuthClient
 from src.api_client.exceptions import UserAlreadyRegistered, UserNotFound, Unauthorized
 from src.api_client.schemas import UserCreate, TokenResponse
-from src.modile.config import get_config
+from src.mobile.config import get_config
 
 
 class AuthViewModel:

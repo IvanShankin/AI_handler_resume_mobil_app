@@ -27,7 +27,7 @@ class RequirementClient:
 
             data = response.json()
 
-            return [RequirementsOut.model_validate(item) for item in data]
+            return [RequirementsOut.parse_obj(item) for item in data]
 
         except NotFoundData:
             return []
@@ -50,4 +50,4 @@ class RequirementClient:
         )
         data = response.json()
 
-        return bool(DeleteRequirementsResponse.model_validate(data))
+        return bool(DeleteRequirementsResponse.parse_obj(data))

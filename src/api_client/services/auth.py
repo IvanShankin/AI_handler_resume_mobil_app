@@ -6,7 +6,7 @@ from src.api_client.schemas import (
     TokenResponse,
     RefreshTokenRequest,
 )
-from src.modile.config import get_config
+from src.mobile.config import get_config
 
 
 class AuthClient:
@@ -18,7 +18,7 @@ class AuthClient:
             response = await self.api.request(
                 "POST",
                 "/auth/register",
-                json=user.model_dump()
+                json=user.dict()
             )
             return UserOut(**response.json())
         except APIClientError as e:
@@ -55,7 +55,7 @@ class AuthClient:
                 "/auth/refresh_token",
                 json=RefreshTokenRequest(
                     refresh_token=refresh_token
-                ).model_dump(),
+                ).dict(),
                 skip_refresh = True
             )
             data = TokenResponse(**response.json())

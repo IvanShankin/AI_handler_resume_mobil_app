@@ -1,9 +1,9 @@
 import asyncio
 
-from src.modile.config import set_config, get_config
-from src.modile.models.config_model import Config
-from src.modile.ui.main_ui import AuthApp
-from src.modile.utils.core_logger import setup_logging
+from src.mobile.config import set_config, get_config
+from src.mobile.models.config_model import Config
+from src.mobile.ui.main_ui import AuthApp
+from src.mobile.utils.core_logger import setup_logging
 
 
 async def main():

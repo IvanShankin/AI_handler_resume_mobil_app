@@ -3,8 +3,8 @@ from typing import Optional
 import httpx
 
 from src.api_client.exceptions import Unauthorized, APIClientError, NotFoundData
-from src.modile.config import get_config
-from src.modile.utils.core_logger import get_logger
+from src.mobile.config import get_config
+from src.mobile.utils.core_logger import get_logger
 
 
 class BaseAPIClient:

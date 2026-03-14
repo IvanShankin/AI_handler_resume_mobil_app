@@ -1,4 +1,4 @@
-from src.modile.models.config_model import Config
+from src.mobile.models.config_model import Config
 
 _config: Config = None
 

@@ -13,11 +13,11 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
 
 from src.api_client.schemas import RequirementsOut
-from src.modile.config import get_config
-from src.modile.ui.elements.buttons import RoundButton
-from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
-from src.modile.ui.screens.requirements.show_requirement import RequirementDetailScreen
-from src.modile.view_models.requirements import RequirementsModel
+from src.mobile.config import get_config
+from src.mobile.ui.elements.buttons import RoundButton
+from src.mobile.ui.screens.modal_window.modal_with_ok import show_modal
+from src.mobile.ui.screens.requirements.show_requirement import RequirementDetailScreen
+from src.mobile.view_models.requirements import RequirementsModel
 
 MIN_CELL_WIDTH = 260
 CARD_HEIGHT = 120

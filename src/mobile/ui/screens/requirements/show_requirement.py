@@ -13,13 +13,13 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
 
 from src.api_client.schemas import RequirementsOut, ResumeOut
-from src.modile.config import get_config
-from src.modile.ui.elements.buttons import RoundButton
-from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
-from src.modile.ui.screens.modal_window.modal_yes_or_no import show_confirm_modal
-from src.modile.ui.screens.resume.show_resume_processing import ResumeProcessingScreen
-from src.modile.view_models.requirements import RequirementsModel
-from src.modile.view_models.resume import ResumeModel
+from src.mobile.config import get_config
+from src.mobile.ui.elements.buttons import RoundButton
+from src.mobile.ui.screens.modal_window.modal_with_ok import show_modal
+from src.mobile.ui.screens.modal_window.modal_yes_or_no import show_confirm_modal
+from src.mobile.ui.screens.resume.show_resume_processing import ResumeProcessingScreen
+from src.mobile.view_models.requirements import RequirementsModel
+from src.mobile.view_models.resume import ResumeModel
 
 MIN_CELL_WIDTH = 260
 CARD_HEIGHT = 120

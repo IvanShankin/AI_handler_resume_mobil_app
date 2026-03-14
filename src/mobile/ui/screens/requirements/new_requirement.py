@@ -7,6 +7,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+from kivy.metrics import dp, sp
 
 from src.mobile.config import get_config
 from src.mobile.ui.screens.modal_window.modal_with_ok import show_modal
@@ -35,8 +36,8 @@ class CreateRequirementScreen(Screen):
 
         panel = BoxLayout(
             orientation="vertical",
-            spacing=14,
-            padding=[24, 88, 24, 24],
+            spacing=dp(14),
+            padding=[dp(24), dp(88), dp(24), dp(24)],
             size_hint=(0.95, 0.95),
             pos_hint={"center_x": 0.5, "center_y": 0.5},
         )
@@ -44,13 +45,13 @@ class CreateRequirementScreen(Screen):
 
         with panel.canvas.before:
             Color(*PANEL_COLOR)
-            self.panel_bg = RoundedRectangle(pos=panel.pos, size=panel.size, radius=[18])
+            self.panel_bg = RoundedRectangle(pos=panel.pos, size=panel.size, radius=[dp(18)])
         panel.bind(pos=self._update_panel_bg, size=self._update_panel_bg)
 
         back_btn = Button(
             text="Назад",
             size_hint=(None, None),
-            size=(92, 42),
+            size=(dp(92), dp(42)),
             pos_hint={"x": 0.03, "top": 0.965},
             background_normal='',
             background_color=BTN_NEUTRAL_BG,
@@ -63,9 +64,9 @@ class CreateRequirementScreen(Screen):
         title = Label(
             text="Новое требование",
             size_hint=(1, None),
-            height=40,
+            height=dp(40),
             color=TEXT_COLOR,
-            font_size=24,
+            font_size=sp(24),
             bold=True,
         )
         panel.add_widget(title)
@@ -73,9 +74,9 @@ class CreateRequirementScreen(Screen):
         subtitle = Label(
             text="Опишите требование для обработки резюме",
             size_hint=(1, None),
-            height=24,
+            height=dp(24),
             color=SUBTLE_COLOR,
-            font_size=14,
+            font_size=sp(14),
         )
         panel.add_widget(subtitle)
 
@@ -87,13 +88,13 @@ class CreateRequirementScreen(Screen):
             background_color=(1, 1, 1, 1),
             foreground_color=TEXT_COLOR,
             cursor_color=TEXT_COLOR,
-            padding=(14, 14),
+            padding=(dp(14), dp(14)),
         )
 
         add_btn = Button(
             text="Добавить",
             size_hint=(1, None),
-            height=52,
+            height=dp(52),
             background_normal='',
             background_color=BTN_PRIMARY_BG,
             color=(1, 1, 1, 1),

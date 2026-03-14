@@ -11,6 +11,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
+from kivy.metrics import dp, sp
 
 from src.api_client.schemas import RequirementsOut
 from src.mobile.config import get_config
@@ -19,8 +20,8 @@ from src.mobile.ui.screens.modal_window.modal_with_ok import show_modal
 from src.mobile.ui.screens.requirements.show_requirement import RequirementDetailScreen
 from src.mobile.view_models.requirements import RequirementsModel
 
-MIN_CELL_WIDTH = 260
-CARD_HEIGHT = 120
+MIN_CELL_WIDTH = dp(260)
+CARD_HEIGHT = dp(120)
 
 BG_COLOR = (0.92, 0.92, 0.92, 1)
 PANEL_COLOR = (0.92, 0.92, 0.92, 1)
@@ -45,21 +46,21 @@ class AllRequirementsScreen(Screen):
         root = FloatLayout()
         self.add_widget(root)
 
-        container = AnchorLayout(anchor_x="center", anchor_y="top", size_hint=(1, 1), padding=(16, 22, 16, 16))
+        container = AnchorLayout(anchor_x="center", anchor_y="top", size_hint=(1, 1), padding=(dp(16), dp(22), dp(16), dp(16)))
         root.add_widget(container)
 
         with container.canvas.before:
             Color(*PANEL_COLOR)
-            self.panel = RoundedRectangle(pos=container.pos, size=container.size, radius=[18])
+            self.panel = RoundedRectangle(pos=container.pos, size=container.size, radius=[dp(18)])
         container.bind(pos=self._update_panel, size=self._update_panel)
 
-        vbox = BoxLayout(orientation="vertical", spacing=14, padding=(18, 52, 18, 18), size_hint=(0.99, 0.99))
+        vbox = BoxLayout(orientation="vertical", spacing=dp(14), padding=(dp(18), dp(52), dp(18), dp(18)), size_hint=(0.99, 0.99))
         container.add_widget(vbox)
 
         back_btn = Button(
             text="Выйти",
             size_hint=(None, None),
-            size=(92, 42),
+            size=(dp(92), dp(42)),
             pos_hint={"x": 0.03, "top": 0.965},
             background_color=BTN_NEUTRAL_BG,
             color=(1, 1, 1, 1),
@@ -72,8 +73,8 @@ class AllRequirementsScreen(Screen):
             text="Список всех требований",
             color=TEXT_COLOR,
             size_hint=(1, None),
-            height=40,
-            font_size=24,
+            height=dp(40),
+            font_size=sp(24),
             bold=True,
         )
         vbox.add_widget(title)
@@ -82,23 +83,23 @@ class AllRequirementsScreen(Screen):
             text="Выберите требование для просмотра деталей",
             color=SUBTLE_TEXT_COLOR,
             size_hint=(1, None),
-            height=26,
-            font_size=14,
+            height=dp(26),
+            font_size=sp(14),
         )
         vbox.add_widget(subtitle)
 
         self.scroll = ScrollView(size_hint=(1, 1), bar_color=(0.5, 0.5, 0.55, 0.7), bar_inactive_color=(0.75, 0.75, 0.78, 0.3))
         vbox.add_widget(self.scroll)
 
-        self.grid = GridLayout(cols=1, spacing=12, padding=6, size_hint_y=None)
+        self.grid = GridLayout(cols=1, spacing=dp(12), padding=dp(6), size_hint_y=None)
         self.grid.bind(minimum_height=self.grid.setter('height'))
         self.scroll.add_widget(self.grid)
 
         fab = RoundButton(
             text="+",
-            font_size=36,
+            font_size=sp(36),
             size_hint=(None, None),
-            size=(62, 62),
+            size=(dp(62), dp(62)),
             pos_hint={'center_x': 0.5, 'y': 0.022},
             background_color=FAB_BG,
             color=(1, 1, 1, 1),
@@ -167,9 +168,9 @@ class AllRequirementsScreen(Screen):
                 text_size=(None, None),
                 background_normal='',
                 background_color=CARD_COLOR,
-                padding=(16, 10),
+                padding=(dp(16), dp(10)),
             )
-            btn.text_size = (self._calc_cell_inner_width(), CARD_HEIGHT - 22)
+            btn.text_size = (self._calc_cell_inner_width(), CARD_HEIGHT - dp(22))
             btn.halign = "left"
             btn.valign = "middle"
 
@@ -180,7 +181,7 @@ class AllRequirementsScreen(Screen):
 
     def _calc_cell_inner_width(self):
         cols = max(1, self.grid.cols)
-        return max(100, (self.width * 0.96) / cols - 30)
+        return max(dp(100), (self.width * 0.96) / cols - dp(30))
 
     def open_requirement(self, requirement: RequirementsOut):
         self.requirements_detail.set_requirement(requirement=requirement)

@@ -11,6 +11,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.label import Label
 from kivy.uix.button import Button
+from kivy.metrics import dp, sp
 
 from src.api_client.schemas import ProcessingOut
 from src.mobile.config import get_config
@@ -62,8 +63,8 @@ class ResumeProcessingScreen(Screen):
 
         self.vbox = BoxLayout(
             orientation="vertical",
-            spacing=14,
-            padding=[24, 78, 24, 24],
+            spacing=dp(14),
+            padding=[dp(24), dp(78), dp(24), dp(24)],
             size_hint=(0.96, 0.96),
             pos_hint={"center_x": 0.5, "center_y": 0.5},
         )
@@ -71,13 +72,13 @@ class ResumeProcessingScreen(Screen):
 
         with self.vbox.canvas.before:
             Color(*PANEL_COLOR)
-            self.panel_bg = RoundedRectangle(pos=self.vbox.pos, size=self.vbox.size, radius=[18])
+            self.panel_bg = RoundedRectangle(pos=self.vbox.pos, size=self.vbox.size, radius=[dp(18)])
         self.vbox.bind(pos=self._update_panel_bg, size=self._update_panel_bg)
 
         back_btn = Button(
             text="Назад",
             size_hint=(None, None),
-            size=(92, 42),
+            size=(dp(92), dp(42)),
             pos_hint={"x": 0.03, "top": 0.965},
             background_normal='',
             background_color=BTN_NEUTRAL_BG,
@@ -90,7 +91,7 @@ class ResumeProcessingScreen(Screen):
         copy_btn = Button(
             text="",
             size_hint=(None, None),
-            size=(64, 64),
+            size=(dp(64), dp(64)),
             pos_hint={"right": 0.97, "top": 0.965},
             background_normal=str(get_config().copy_icon),
             background_color=BTN_NEUTRAL_BG,
@@ -103,9 +104,9 @@ class ResumeProcessingScreen(Screen):
         self.resume_title = Label(
             text="Резюме",
             size_hint=(1, None),
-            height=28,
+            height=dp(28),
             color=TEXT_COLOR,
-            font_size=18,
+            font_size=sp(18),
             bold=True,
         )
         self.vbox.add_widget(self.resume_title)
@@ -117,7 +118,7 @@ class ResumeProcessingScreen(Screen):
             halign="left",
             valign="top",
             color=TEXT_COLOR,
-            font_size=16,
+            font_size=sp(16),
         )
         self.resume_label.bind(texture_size=self._update_resume_height)
         self.resume_scroll.add_widget(self.resume_label)
@@ -126,9 +127,9 @@ class ResumeProcessingScreen(Screen):
         self.processing_title = Label(
             text="Обработка",
             size_hint=(1, None),
-            height=28,
+            height=dp(28),
             color=TEXT_COLOR,
-            font_size=18,
+            font_size=sp(18),
             bold=True,
         )
         self.vbox.add_widget(self.processing_title)
@@ -140,14 +141,14 @@ class ResumeProcessingScreen(Screen):
             halign="left",
             valign="top",
             color=TEXT_COLOR,
-            font_size=16,
+            font_size=sp(16),
         )
         self.processing_label.bind(texture_size=self._update_processing_height)
         self.processing_scroll.add_widget(self.processing_label)
 
         self.vbox.add_widget(self.processing_scroll)
 
-        self.processing_actions = BoxLayout(size_hint=(1, None), height=48, spacing=10)
+        self.processing_actions = BoxLayout(size_hint=(1, None), height=dp(48), spacing=dp(10))
         self.show_resume_btn = Button(
             text="Просмотреть резюме",
             background_normal='',

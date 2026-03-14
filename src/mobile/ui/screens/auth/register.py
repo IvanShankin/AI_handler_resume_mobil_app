@@ -6,6 +6,7 @@ from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
+from kivy.metrics import dp, sp
 
 from src.mobile.config import get_config
 from src.mobile.ui.elements.creating_elements import create_textinput, create_button
@@ -26,13 +27,13 @@ class RegisterScreen(Screen):
 
         anchor = AnchorLayout(anchor_x='center', anchor_y='center')
 
-        layout = BoxLayout(orientation="vertical", spacing=15, size_hint=(0.8, None))
+        layout = BoxLayout(orientation="vertical", spacing=dp(15), size_hint=(0.8, None))
         layout.bind(minimum_height=layout.setter('height'))
 
         self.email_input = create_textinput("Email")
         self.password_input = create_textinput("Password", password=True)
         self.fullname_input = create_textinput("Full Name")
-        self.message_label = Label(size_hint=(1, None), height=30, color=(1,0,0,1))
+        self.message_label = Label(size_hint=(1, None), height=dp(30), color=(1,0,0,1))
 
         register_btn = create_button("Зарегистрироваться")
         register_btn.bind(on_release=self.register)

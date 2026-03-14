@@ -6,6 +6,7 @@ from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
+from kivy.metrics import dp, sp
 
 from src.mobile.config import get_config
 from src.mobile.ui.elements.creating_elements import create_textinput, create_button
@@ -26,12 +27,12 @@ class LoginScreen(Screen):
         self.bind(size=self._update_bg, pos=self._update_bg)
 
         anchor = AnchorLayout(anchor_x='center', anchor_y='center')
-        layout = BoxLayout(orientation="vertical", spacing=15, size_hint=(0.8, None))
+        layout = BoxLayout(orientation="vertical", spacing=dp(15), size_hint=(0.8, None))
         layout.bind(minimum_height=layout.setter('height'))
 
         self.username_input = create_textinput("Email")
         self.password_input = create_textinput("Password", password=True)
-        self.message_label = Label(size_hint=(1, None), height=30)
+        self.message_label = Label(size_hint=(1, None), height=dp(30))
 
         login_btn = create_button("Вход")
         login_btn.bind(on_release=self.login_clicked)

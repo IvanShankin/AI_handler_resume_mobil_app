@@ -11,6 +11,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
+from kivy.metrics import dp, sp
 
 from src.api_client.schemas import RequirementsOut, ResumeOut
 from src.mobile.config import get_config
@@ -21,8 +22,8 @@ from src.mobile.ui.screens.resume.show_resume_processing import ResumeProcessing
 from src.mobile.view_models.requirements import RequirementsModel
 from src.mobile.view_models.resume import ResumeModel
 
-MIN_CELL_WIDTH = 260
-CARD_HEIGHT = 120
+MIN_CELL_WIDTH = dp(260)
+CARD_HEIGHT = dp(120)
 
 BG_COLOR = (0.92, 0.92, 0.92, 1)
 PANEL_COLOR = (0.92, 0.92, 0.92, 1)
@@ -61,18 +62,18 @@ class RequirementDetailScreen(Screen):
         root = FloatLayout()
         self.add_widget(root)
 
-        container = AnchorLayout(anchor_x="center", anchor_y="top", padding=(16, 22, 16, 16))
+        container = AnchorLayout(anchor_x="center", anchor_y="top", padding=(dp(16), dp(22), dp(16), dp(16)))
         root.add_widget(container)
 
         with container.canvas.before:
             Color(*PANEL_COLOR)
-            self.panel_bg = RoundedRectangle(pos=container.pos, size=container.size, radius=[18])
+            self.panel_bg = RoundedRectangle(pos=container.pos, size=container.size, radius=[dp(18)])
         container.bind(pos=self._update_panel_bg, size=self._update_panel_bg)
 
         back_btn = Button(
             text="Назад",
             size_hint=(None, None),
-            size=(92, 42),
+            size=(dp(92), dp(42)),
             pos_hint={"x": 0.03, "top": 0.965},
             background_normal='',
             background_color=BTN_NEUTRAL_BG,
@@ -84,8 +85,8 @@ class RequirementDetailScreen(Screen):
 
         self.vbox = BoxLayout(
             orientation="vertical",
-            spacing=12,
-            padding=(18, 52, 18, 18),
+            spacing=dp(12),
+            padding=(dp(18), dp(52), dp(18), dp(18)),
             size_hint=(0.99, 0.99)
         )
         container.add_widget(self.vbox)
@@ -93,14 +94,14 @@ class RequirementDetailScreen(Screen):
         self.title = Label(
             text="Требование",
             size_hint=(1, None),
-            height=42,
+            height=dp(42),
             color=TEXT_COLOR,
-            font_size=24,
+            font_size=sp(24),
             bold=True,
         )
         self.vbox.add_widget(self.title)
 
-        self.req_scroll = ScrollView(size_hint=(1, None), height=130)
+        self.req_scroll = ScrollView(size_hint=(1, None), height=dp(130))
 
         self.req_label = Label(
             text="",
@@ -108,7 +109,7 @@ class RequirementDetailScreen(Screen):
             halign="left",
             valign="top",
             color=TEXT_COLOR,
-            font_size=16,
+            font_size=sp(16),
         )
 
         self.req_label.bind(texture_size=self._update_req_height)
@@ -119,16 +120,16 @@ class RequirementDetailScreen(Screen):
         resume_title = Label(
             text="Резюме",
             size_hint=(1, None),
-            height=34,
+            height=dp(34),
             color=SUBTLE_TEXT,
-            font_size=18,
+            font_size=sp(18),
             bold=True,
         )
         self.vbox.add_widget(resume_title)
 
         self.resume_scroll = ScrollView(size_hint=(1, 1), bar_color=(0.5, 0.5, 0.55, 0.7), bar_inactive_color=(0.75, 0.75, 0.78, 0.3))
 
-        self.resume_grid = GridLayout(cols=1, spacing=12, padding=6, size_hint_y=None)
+        self.resume_grid = GridLayout(cols=1, spacing=dp(12), padding=dp(6), size_hint_y=None)
         self.resume_grid.bind(minimum_height=self.resume_grid.setter("height"))
 
         self.resume_scroll.add_widget(self.resume_grid)
@@ -137,7 +138,7 @@ class RequirementDetailScreen(Screen):
         self.bind(size=self._update_resume_cols)
         self.resume_grid.bind(width=lambda *_: self._update_resume_cols())
 
-        action_box = BoxLayout(size_hint=(1, None), height=52, spacing=10)
+        action_box = BoxLayout(size_hint=(1, None), height=dp(52), spacing=dp(10))
 
         self.show_full_btn = Button(
             text="Показать полностью",
@@ -164,9 +165,9 @@ class RequirementDetailScreen(Screen):
 
         fab = RoundButton(
             text="+",
-            font_size=36,
+            font_size=sp(36),
             size_hint=(None, None),
-            size=(56, 56),
+            size=(dp(56), dp(56)),
             pos_hint={'center_x': 0.5, 'y': 0.15},
             background_color=FAB_BG,
             color=(1, 1, 1, 1),
@@ -191,10 +192,10 @@ class RequirementDetailScreen(Screen):
 
     def _calc_resume_cell_width(self):
         cols = max(1, self.resume_grid.cols)
-        return max(100, (self.width * 0.96) / cols - 30)
+        return max(dp(100), (self.width * 0.96) / cols - dp(30))
 
     def _update_text_width(self, instance, value):
-        self.req_label.text_size = (instance.width - 20, None)
+        self.req_label.text_size = (instance.width - dp(20), None)
 
     def set_requirement(self, requirement: RequirementsOut):
         self.requirement = requirement
@@ -278,10 +279,10 @@ class RequirementDetailScreen(Screen):
                 background_normal='',
                 background_color=CARD_COLOR,
                 color=TEXT_COLOR,
-                padding=(16, 10),
+                padding=(dp(16), dp(10)),
             )
 
-            btn.text_size = (self._calc_resume_cell_width(), CARD_HEIGHT - 22)
+            btn.text_size = (self._calc_resume_cell_width(), CARD_HEIGHT - dp(22))
             btn.bind(on_release=lambda inst, r=resume: self.open_resume(r))
 
             self.resume_grid.add_widget(btn)

@@ -105,7 +105,7 @@ class ResumeProcessingScreen(Screen):
         )
         self.vbox.add_widget(self.resume_title)
 
-        self.resume_scroll = ScrollView(size_hint=(1, 0.24), bar_color=(0.5, 0.5, 0.55, 0.7), bar_inactive_color=(0.75, 0.75, 0.78, 0.3))
+        self.resume_scroll = ScrollView(size_hint=(1, None), height=dp(130))
         self.resume_label = Label(
             text="",
             size_hint_y=None,
@@ -115,6 +115,7 @@ class ResumeProcessingScreen(Screen):
             font_size=sp(16),
         )
         self.resume_label.bind(texture_size=self._update_resume_height)
+        self.resume_scroll.bind(width=self._update_text_width)
         self.resume_scroll.add_widget(self.resume_label)
         self.vbox.add_widget(self.resume_scroll)
 
@@ -139,12 +140,31 @@ class ResumeProcessingScreen(Screen):
         )
         self.processing_label.bind(texture_size=self._update_processing_height)
         self.processing_scroll.add_widget(self.processing_label)
+        self.processing_scroll.bind(width=self._update_text_width)
 
         self.vbox.add_widget(self.processing_scroll)
 
-        self.processing_actions = BoxLayout(size_hint=(1, None), height=dp(48), spacing=dp(10))
+        self.controls_container = ScrollView(
+            size_hint=(1, None),
+            height=dp(48),
+            do_scroll_y=False,
+            do_scroll_x=True,
+        )
+
+        self.processing_actions = BoxLayout(
+            orientation="horizontal",
+            size_hint=(None, None),
+            height=dp(48),
+            spacing=dp(10),
+        )
+
+        # чтобы контейнер расширялся по количеству кнопок
+        self.processing_actions.bind(minimum_width=self.processing_actions.setter("width"))
+
         self.show_resume_btn = Button(
             text="Просмотреть резюме",
+            size_hint=(None, 1),
+            width=dp(200),
             background_normal='',
             background_color=self._conf.btn_primary_bg,
             color=(1, 1, 1, 1),
@@ -154,6 +174,8 @@ class ResumeProcessingScreen(Screen):
 
         self.create_processing_btn = Button(
             text="Создать обработку",
+            size_hint=(None, 1),
+            width=dp(200),
             background_normal='',
             background_color=self._conf.btn_primary_bg,
             color=(1, 1, 1, 1),
@@ -163,6 +185,8 @@ class ResumeProcessingScreen(Screen):
 
         self.delete_processing_btn = Button(
             text="Удалить обработку",
+            size_hint=(None, 1),
+            width=dp(200),
             background_normal='',
             background_color=self._conf.btn_danger_bg,
             color=(1, 1, 1, 1),
@@ -172,6 +196,8 @@ class ResumeProcessingScreen(Screen):
 
         self.delete_resume_btn = Button(
             text="Удалить резюме",
+            size_hint=(None, 1),
+            width=dp(200),
             background_normal='',
             background_color=self._conf.btn_danger_bg,
             color=(1, 1, 1, 1),
@@ -183,7 +209,12 @@ class ResumeProcessingScreen(Screen):
         self.processing_actions.add_widget(self.create_processing_btn)
         self.processing_actions.add_widget(self.delete_resume_btn)
         self.processing_actions.add_widget(self.delete_processing_btn)
-        self.vbox.add_widget(self.processing_actions)
+
+        # ВАЖНО — сначала кладём layout в ScrollView
+        self.controls_container.add_widget(self.processing_actions)
+
+        # потом ScrollView в основной layout
+        self.vbox.add_widget(self.controls_container)
 
     def _update_panel_bg(self, instance, *_):
         self.panel_bg.pos = instance.pos
@@ -198,6 +229,10 @@ class ResumeProcessingScreen(Screen):
 
     def _update_processing_height(self, instance, value):
         instance.height = value[1]
+
+    def _update_text_width(self, instance, value):
+        self.resume_label.text_size = (instance.width - dp(20), None)
+        self.processing_label.text_size = (instance.width - dp(20), None)
 
     def load(self, requirement_id: int, resume_id: int, full_resume: str):
         self._is_active = True

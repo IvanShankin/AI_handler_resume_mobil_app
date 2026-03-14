@@ -213,7 +213,12 @@ class RequirementDetailScreen(Screen):
             data: List[RequirementsOut] = fut.result()
             if not data:
                 raise ValueError("Требование не найдено")
+
             requirement = data[0]
+            for req in data:
+                if req.requirement_id == self.requirement_id:
+                    requirement = req
+
         except Exception as e:
             Clock.schedule_once(
                 lambda dt, err=e: show_modal(f"Ошибка: {str(err)}")

@@ -18,9 +18,10 @@ class RegisterScreen(Screen):
     def __init__(self, viewmodel: RegViewModel, **kwargs):
         super().__init__(**kwargs)
         self.viewmodel = viewmodel
+        conf = get_config()
 
         with self.canvas.before:
-            Color(0.92, 0.92, 0.92, 1)  # светло-серый
+            Color(*conf.bg_color)  # светло-серый
             self.bg = Rectangle(size=self.size, pos=self.pos)
 
         self.bind(size=self._update_bg, pos=self._update_bg)

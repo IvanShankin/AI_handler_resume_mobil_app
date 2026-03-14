@@ -24,6 +24,17 @@ class Config(BaseModel):
     max_char_requirements: int = 1000
     max_char_resume: int = 5000
 
+    bg_color: tuple[float, float, float, float] = (0.92, 0.92, 0.92, 1)
+    panel_color: tuple[float, float, float, float] = (0.92, 0.92, 0.92, 1)
+    card_color: tuple[float, float, float, float] = (1, 1, 1, 1)
+    text_color: tuple[float, float, float, float] = (0.14, 0.14, 0.16, 1)
+    subtle_text_color: tuple[float, float, float, float] = (0.35, 0.35, 0.38, 1)
+    btn_neutral_bg: tuple[float, float, float, float] = (2.2, 2.2, 2.2, 1)
+    btn_neutral_bg_soft: tuple[float, float, float, float] = (0.8, 0.8, 0.8, 1)
+    btn_primary_bg: tuple[float, float, float, float] = (0.28, 0.28, 0.31, 1)
+    btn_danger_bg: tuple[float, float, float, float] = (0.4, 0.4, 0.43, 1)
+    fab_bg: tuple[float, float, float, float] = (0.2, 0.2, 0.22, 1)
+
     base: Path = get_base_dir()
     media: Path = base / Path("media")
     log_file: Path = media / Path("mobile_app.log")

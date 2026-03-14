@@ -23,23 +23,16 @@ from src.mobile.view_models.requirements import RequirementsModel
 MIN_CELL_WIDTH = dp(260)
 CARD_HEIGHT = dp(120)
 
-BG_COLOR = (0.92, 0.92, 0.92, 1)
-PANEL_COLOR = (0.92, 0.92, 0.92, 1)
-CARD_COLOR = (1, 1, 1, 1)
-TEXT_COLOR = (0.14, 0.14, 0.16, 1)
-SUBTLE_TEXT_COLOR = (0.35, 0.35, 0.38, 1)
-BTN_NEUTRAL_BG = (2.2, 2.2, 2.2, 1)
-FAB_BG = (0.2, 0.2, 0.22, 1)
-
 
 class AllRequirementsScreen(Screen):
     def __init__(self, viewmodel: RequirementsModel, requirements_detail: RequirementDetailScreen, **kwargs):
         super().__init__(**kwargs)
         self.viewmodel = viewmodel
         self.requirements_detail = requirements_detail
+        self._conf = get_config()
 
         with self.canvas.before:
-            Color(*BG_COLOR)
+            Color(*self._conf.bg_color)
             self.bg = Rectangle(size=self.size, pos=self.pos)
         self.bind(size=self._update_bg, pos=self._update_bg)
 
@@ -50,7 +43,7 @@ class AllRequirementsScreen(Screen):
         root.add_widget(container)
 
         with container.canvas.before:
-            Color(*PANEL_COLOR)
+            Color(*self._conf.panel_color)
             self.panel = RoundedRectangle(pos=container.pos, size=container.size, radius=[dp(18)])
         container.bind(pos=self._update_panel, size=self._update_panel)
 
@@ -62,7 +55,7 @@ class AllRequirementsScreen(Screen):
             size_hint=(None, None),
             size=(dp(92), dp(42)),
             pos_hint={"x": 0.03, "top": 0.965},
-            background_color=BTN_NEUTRAL_BG,
+            background_color=self._conf.btn_neutral_bg,
             color=(1, 1, 1, 1),
             bold=True,
         )
@@ -71,7 +64,7 @@ class AllRequirementsScreen(Screen):
 
         title = Label(
             text="Список всех требований",
-            color=TEXT_COLOR,
+            color=self._conf.text_color,
             size_hint=(1, None),
             height=dp(40),
             font_size=sp(24),
@@ -81,7 +74,7 @@ class AllRequirementsScreen(Screen):
 
         subtitle = Label(
             text="Выберите требование для просмотра деталей",
-            color=SUBTLE_TEXT_COLOR,
+            color=self._conf.subtle_text_color,
             size_hint=(1, None),
             height=dp(26),
             font_size=sp(14),
@@ -101,7 +94,7 @@ class AllRequirementsScreen(Screen):
             size_hint=(None, None),
             size=(dp(62), dp(62)),
             pos_hint={'center_x': 0.5, 'y': 0.022},
-            background_color=FAB_BG,
+            background_color=self._conf.fab_bg,
             color=(1, 1, 1, 1),
         )
         fab.bind(on_release=self.on_add_requirement)
@@ -159,7 +152,7 @@ class AllRequirementsScreen(Screen):
         for req in requirements:
             text = (req.requirements[:120] + "…") if len(req.requirements) > 120 else req.requirements
             btn = Button(
-                color=TEXT_COLOR,
+                color=self._conf.text_color,
                 text=text,
                 size_hint_y=None,
                 height=CARD_HEIGHT,
@@ -167,7 +160,7 @@ class AllRequirementsScreen(Screen):
                 valign="middle",
                 text_size=(None, None),
                 background_normal='',
-                background_color=CARD_COLOR,
+                background_color=self._conf.card_color,
                 padding=(dp(16), dp(10)),
             )
             btn.text_size = (self._calc_cell_inner_width(), CARD_HEIGHT - dp(22))

@@ -5,10 +5,12 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.clock import Clock
 from kivy.metrics import dp, sp
+from src.mobile.config import get_config
 
 
 
 def show_modal(text: str):
+    conf = get_config()
     modal = ModalView(
         size_hint=(0.7, 0.5),
         auto_dismiss=False,
@@ -47,7 +49,7 @@ def show_modal(text: str):
         size_hint=(1, None),
         height=dp(50),
         font_size=sp(16),
-        background_color=(0.28, 0.28, 0.31, 1),
+        background_color=conf.btn_primary_bg,
         color=(1, 1, 1, 1)
     )
     btn.bind(on_release=modal.dismiss)

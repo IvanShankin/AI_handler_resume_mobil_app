@@ -18,10 +18,11 @@ class LoginScreen(Screen):
     def __init__(self, viewmodel: AuthViewModel, **kwargs):
         super().__init__(**kwargs)
         self.viewmodel = viewmodel
+        conf = get_config()
 
         # --- UI остаётся ---
         with self.canvas.before:
-            Color(0.92, 0.92, 0.92, 1)
+            Color(*conf.bg_color)
             self.bg = Rectangle(size=self.size, pos=self.pos)
 
         self.bind(size=self._update_bg, pos=self._update_bg)
@@ -49,7 +50,6 @@ class LoginScreen(Screen):
         anchor.add_widget(layout)
         self.add_widget(anchor)
 
-        conf = get_config()
         future = asyncio.run_coroutine_threadsafe(
             self.viewmodel.check_refresh_token(),
             conf.global_event_loop

@@ -21,13 +21,6 @@ from src.mobile.utils.core_logger import get_logger
 from src.mobile.view_models.resume import ResumeModel
 from src.mobile.view_models.processing import ProcessingModel
 
-BG_COLOR = (0.92, 0.92, 0.92, 1)
-PANEL_COLOR = (0.92, 0.92, 0.92, 1)
-TEXT_COLOR = (0.14, 0.14, 0.16, 1)
-BTN_NEUTRAL_BG = (0.8, 0.8, 0.8, 1)
-BTN_PRIMARY_BG = (0.28, 0.28, 0.31, 1)
-BTN_DANGER_BG = (0.4, 0.4, 0.43, 1)
-
 
 class ResumeProcessingScreen(Screen):
     def __init__(
@@ -40,6 +33,7 @@ class ResumeProcessingScreen(Screen):
 
         self.resume_model = resume_model
         self.processing_model = processing_model
+        self._conf = get_config()
 
         self.current_resume_id: Optional[int] = None
         self.current_requirement_id: Optional[int] = None
@@ -54,7 +48,7 @@ class ResumeProcessingScreen(Screen):
         self._max_processing_poll_attempts = 20
 
         with self.canvas.before:
-            Color(*BG_COLOR)
+            Color(*self._conf.bg_color)
             self.bg = Rectangle(size=self.size, pos=self.pos)
         self.bind(size=self._update_bg, pos=self._update_bg)
 
@@ -71,7 +65,7 @@ class ResumeProcessingScreen(Screen):
         root.add_widget(self.vbox)
 
         with self.vbox.canvas.before:
-            Color(*PANEL_COLOR)
+            Color(*self._conf.panel_color)
             self.panel_bg = RoundedRectangle(pos=self.vbox.pos, size=self.vbox.size, radius=[dp(18)])
         self.vbox.bind(pos=self._update_panel_bg, size=self._update_panel_bg)
 
@@ -81,7 +75,7 @@ class ResumeProcessingScreen(Screen):
             size=(dp(92), dp(42)),
             pos_hint={"x": 0.03, "top": 0.965},
             background_normal='',
-            background_color=BTN_NEUTRAL_BG,
+            background_color=self._conf.btn_neutral_bg_soft,
             color=(1, 1, 1, 1),
             bold=True,
         )
@@ -93,8 +87,8 @@ class ResumeProcessingScreen(Screen):
             size_hint=(None, None),
             size=(dp(64), dp(64)),
             pos_hint={"right": 0.97, "top": 0.965},
-            background_normal=str(get_config().copy_icon),
-            background_color=BTN_NEUTRAL_BG,
+            background_normal=str(self._conf.copy_icon),
+            background_color=self._conf.btn_neutral_bg_soft,
         )
 
         copy_btn.bind(on_release=self.copy_processing_to_clipboard)
@@ -105,7 +99,7 @@ class ResumeProcessingScreen(Screen):
             text="Резюме",
             size_hint=(1, None),
             height=dp(28),
-            color=TEXT_COLOR,
+            color=self._conf.text_color,
             font_size=sp(18),
             bold=True,
         )
@@ -117,7 +111,7 @@ class ResumeProcessingScreen(Screen):
             size_hint_y=None,
             halign="left",
             valign="top",
-            color=TEXT_COLOR,
+            color=self._conf.text_color,
             font_size=sp(16),
         )
         self.resume_label.bind(texture_size=self._update_resume_height)
@@ -128,7 +122,7 @@ class ResumeProcessingScreen(Screen):
             text="Обработка",
             size_hint=(1, None),
             height=dp(28),
-            color=TEXT_COLOR,
+            color=self._conf.text_color,
             font_size=sp(18),
             bold=True,
         )
@@ -140,7 +134,7 @@ class ResumeProcessingScreen(Screen):
             size_hint_y=None,
             halign="left",
             valign="top",
-            color=TEXT_COLOR,
+            color=self._conf.text_color,
             font_size=sp(16),
         )
         self.processing_label.bind(texture_size=self._update_processing_height)
@@ -152,7 +146,7 @@ class ResumeProcessingScreen(Screen):
         self.show_resume_btn = Button(
             text="Просмотреть резюме",
             background_normal='',
-            background_color=BTN_PRIMARY_BG,
+            background_color=self._conf.btn_primary_bg,
             color=(1, 1, 1, 1),
             bold=True,
         )
@@ -161,7 +155,7 @@ class ResumeProcessingScreen(Screen):
         self.create_processing_btn = Button(
             text="Создать обработку",
             background_normal='',
-            background_color=BTN_PRIMARY_BG,
+            background_color=self._conf.btn_primary_bg,
             color=(1, 1, 1, 1),
             bold=True,
         )
@@ -170,7 +164,7 @@ class ResumeProcessingScreen(Screen):
         self.delete_processing_btn = Button(
             text="Удалить обработку",
             background_normal='',
-            background_color=BTN_DANGER_BG,
+            background_color=self._conf.btn_danger_bg,
             color=(1, 1, 1, 1),
             bold=True,
         )
@@ -179,7 +173,7 @@ class ResumeProcessingScreen(Screen):
         self.delete_resume_btn = Button(
             text="Удалить резюме",
             background_normal='',
-            background_color=BTN_DANGER_BG,
+            background_color=self._conf.btn_danger_bg,
             color=(1, 1, 1, 1),
             bold=True,
         )

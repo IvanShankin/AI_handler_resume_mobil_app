@@ -25,16 +25,6 @@ from src.mobile.view_models.resume import ResumeModel
 MIN_CELL_WIDTH = dp(260)
 CARD_HEIGHT = dp(120)
 
-BG_COLOR = (0.92, 0.92, 0.92, 1)
-PANEL_COLOR = (0.92, 0.92, 0.92, 1)
-CARD_COLOR = (1, 1, 1, 1)
-TEXT_COLOR = (0.14, 0.14, 0.16, 1)
-SUBTLE_TEXT = (0.35, 0.35, 0.38, 1)
-BTN_NEUTRAL_BG = (0.8, 0.8, 0.8, 1)
-BTN_PRIMARY_BG = (0.28, 0.28, 0.31, 1)
-BTN_DANGER_BG = (0.4, 0.4, 0.43, 1)
-FAB_BG = (0.2, 0.2, 0.22, 1)
-
 
 class RequirementDetailScreen(Screen):
 
@@ -50,12 +40,13 @@ class RequirementDetailScreen(Screen):
 
         self.viewmodel_req = viewmodel_req
         self.viewmodel_resum = viewmodel_resum
+        self._conf = get_config()
 
         self.requirement_id: Optional[int] = None
         self.requirement: Optional[RequirementsOut] = None
 
         with self.canvas.before:
-            Color(*BG_COLOR)
+            Color(*self._conf.bg_color)
             self.bg = Rectangle(size=self.size, pos=self.pos)
         self.bind(size=self._update_bg, pos=self._update_bg)
 
@@ -66,7 +57,7 @@ class RequirementDetailScreen(Screen):
         root.add_widget(container)
 
         with container.canvas.before:
-            Color(*PANEL_COLOR)
+            Color(*self._conf.panel_color)
             self.panel_bg = RoundedRectangle(pos=container.pos, size=container.size, radius=[dp(18)])
         container.bind(pos=self._update_panel_bg, size=self._update_panel_bg)
 
@@ -76,7 +67,7 @@ class RequirementDetailScreen(Screen):
             size=(dp(92), dp(42)),
             pos_hint={"x": 0.03, "top": 0.965},
             background_normal='',
-            background_color=BTN_NEUTRAL_BG,
+            background_color=self._conf.btn_neutral_bg_soft,
             color=(1, 1, 1, 1),
             bold=True,
         )
@@ -95,7 +86,7 @@ class RequirementDetailScreen(Screen):
             text="Требование",
             size_hint=(1, None),
             height=dp(42),
-            color=TEXT_COLOR,
+            color=self._conf.text_color,
             font_size=sp(24),
             bold=True,
         )
@@ -108,7 +99,7 @@ class RequirementDetailScreen(Screen):
             size_hint_y=None,
             halign="left",
             valign="top",
-            color=TEXT_COLOR,
+            color=self._conf.text_color,
             font_size=sp(16),
         )
 
@@ -121,7 +112,7 @@ class RequirementDetailScreen(Screen):
             text="Резюме",
             size_hint=(1, None),
             height=dp(34),
-            color=SUBTLE_TEXT,
+            color=self._conf.subtle_text_color,
             font_size=sp(18),
             bold=True,
         )
@@ -143,7 +134,7 @@ class RequirementDetailScreen(Screen):
         self.show_full_btn = Button(
             text="Показать полностью",
             background_normal='',
-            background_color=BTN_PRIMARY_BG,
+            background_color=self._conf.btn_primary_bg,
             color=(1, 1, 1, 1),
             bold=True,
         )
@@ -152,7 +143,7 @@ class RequirementDetailScreen(Screen):
         self.delete_btn = Button(
             text="Удалить",
             background_normal='',
-            background_color=BTN_DANGER_BG,
+            background_color=self._conf.btn_danger_bg,
             color=(1, 1, 1, 1),
             bold=True,
         )
@@ -169,7 +160,7 @@ class RequirementDetailScreen(Screen):
             size_hint=(None, None),
             size=(dp(56), dp(56)),
             pos_hint={'center_x': 0.5, 'y': 0.15},
-            background_color=FAB_BG,
+            background_color=self._conf.fab_bg,
             color=(1, 1, 1, 1),
         )
         fab.bind(on_release=self.add_resume)
@@ -277,8 +268,8 @@ class RequirementDetailScreen(Screen):
                 halign="left",
                 valign="middle",
                 background_normal='',
-                background_color=CARD_COLOR,
-                color=TEXT_COLOR,
+                background_color=self._conf.card_color,
+                color=self._conf.text_color,
                 padding=(dp(16), dp(10)),
             )
 

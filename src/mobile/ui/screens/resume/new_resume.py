@@ -13,22 +13,16 @@ from src.mobile.config import get_config
 from src.mobile.ui.screens.modal_window.modal_with_ok import show_modal
 from src.mobile.view_models.resume import ResumeModel
 
-BG_COLOR = (0.92, 0.92, 0.92, 1)
-PANEL_COLOR = (0.92, 0.92, 0.92, 1)
-TEXT_COLOR = (0.14, 0.14, 0.16, 1)
-SUBTLE_COLOR = (0.35, 0.35, 0.38, 1)
-BTN_NEUTRAL_BG = (0.8, 0.8, 0.8, 1)
-BTN_PRIMARY_BG = (0.28, 0.28, 0.31, 1)
-
 
 class CreateResumeScreen(Screen):
     def __init__(self, viewmodel: ResumeModel, **kwargs):
         super().__init__(**kwargs)
         self.viewmodel = viewmodel
         self.requirement_id: int | None = None
+        self._conf = get_config()
 
         with self.canvas.before:
-            Color(*BG_COLOR)
+            Color(*self._conf.bg_color)
             self.bg = Rectangle(size=self.size, pos=self.pos)
 
         self.bind(size=self._update_bg, pos=self._update_bg)
@@ -46,7 +40,7 @@ class CreateResumeScreen(Screen):
         root.add_widget(panel)
 
         with panel.canvas.before:
-            Color(*PANEL_COLOR)
+            Color(*self._conf.panel_color)
             self.panel_bg = RoundedRectangle(pos=panel.pos, size=panel.size, radius=[dp(18)])
         panel.bind(pos=self._update_panel_bg, size=self._update_panel_bg)
 
@@ -56,7 +50,7 @@ class CreateResumeScreen(Screen):
             size=(dp(92), dp(42)),
             pos_hint={"x": 0.03, "top": 0.965},
             background_normal='',
-            background_color=BTN_NEUTRAL_BG,
+            background_color=self._conf.btn_neutral_bg_soft,
             color=(1, 1, 1, 1),
             bold=True,
         )
@@ -67,7 +61,7 @@ class CreateResumeScreen(Screen):
             text="Новое резюме",
             size_hint=(1, None),
             height=dp(40),
-            color=TEXT_COLOR,
+            color=self._conf.text_color,
             font_size=sp(24),
             bold=True,
         )
@@ -77,7 +71,7 @@ class CreateResumeScreen(Screen):
             text="Добавьте текст резюме для сравнения с требованием",
             size_hint=(1, None),
             height=dp(24),
-            color=SUBTLE_COLOR,
+            color=self._conf.subtle_text_color,
             font_size=sp(14),
         )
         panel.add_widget(subtitle)
@@ -88,8 +82,8 @@ class CreateResumeScreen(Screen):
             size_hint=(1, 1),
             background_normal='',
             background_color=(1, 1, 1, 1),
-            foreground_color=TEXT_COLOR,
-            cursor_color=TEXT_COLOR,
+            foreground_color=self._conf.text_color,
+            cursor_color=self._conf.text_color,
             padding=(dp(14), dp(14)),
         )
 
@@ -98,7 +92,7 @@ class CreateResumeScreen(Screen):
             size_hint=(1, None),
             height=dp(52),
             background_normal='',
-            background_color=BTN_PRIMARY_BG,
+            background_color=self._conf.btn_primary_bg,
             color=(1, 1, 1, 1),
             bold=True,
         )

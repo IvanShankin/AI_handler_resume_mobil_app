@@ -129,21 +129,31 @@ class CreateRequirementScreen(Screen):
         )
         future.add_done_callback(self._on_create_done)
 
-    async def _create_requirement(self, text: str) -> bool:
+    async def _create_requirement(self, text: str):
         return await self.viewmodel.create_new_requirement(text)
 
     def _on_create_done(self, future):
         try:
-            future.result()
+            created = future.result()
         except Exception as e:
             Clock.schedule_once(
                 lambda dt, err=e: show_modal(f"Ошибка: {err}")
             )
             return
 
-        Clock.schedule_once(lambda dt: self._on_success())
+        if not created:
+            Clock.schedule_once(lambda dt: show_modal("Не удалось создать требование"))
+            return
 
-    def _on_success(self):
+        Clock.schedule_once(lambda dt: self._on_success(created))
+
+    def _on_success(self, created):
         self.input_field.text = ""
+        try:
+            all_screen = self.manager.get_screen("all_requirements")
+            all_screen.add_requirement_local(created)
+        except Exception:
+            pass
         show_modal("Требование успешно добавлено")
-        self.manager.current = "all_requirements"
+        self.manager.safe_switch("all_requirements")
+

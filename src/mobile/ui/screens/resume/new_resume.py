@@ -141,27 +141,33 @@ class CreateResumeScreen(Screen):
 
         future.add_done_callback(self._on_create_done)
 
-    async def _create_resume(self, requirement_id: int, text: str) -> bool:
+    async def _create_resume(self, requirement_id: int, text: str):
         return await self.viewmodel.create_resume(requirement_id, text)
 
     def _on_create_done(self, future):
         try:
-            result = future.result()
+            created = future.result()
         except Exception as e:
             Clock.schedule_once(
                 lambda dt, err=e: show_modal(f"Ошибка: {err}")
             )
             return
 
-        if not result:
+        if not created:
             Clock.schedule_once(
                 lambda dt: show_modal("Не удалось создать резюме")
             )
             return
 
-        Clock.schedule_once(lambda dt: self._on_success())
+        Clock.schedule_once(lambda dt: self._on_success(created))
 
-    def _on_success(self):
+    def _on_success(self, created):
         self.input_field.text = ""
+        try:
+            detail_screen = self.manager.get_screen("requirement_detail")
+            detail_screen.add_resume_local(created)
+        except Exception:
+            pass
         show_modal("Резюме успешно добавлено")
         self.manager.safe_switch("requirement_detail")
+

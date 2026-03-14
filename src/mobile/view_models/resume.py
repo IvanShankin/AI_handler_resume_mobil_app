@@ -17,11 +17,11 @@ class ResumeModel:
         resume = await self.resum_client.get_resume(requirement_id=requirement_id, resume_id=resume_id)
         return resume
 
-    async def create_resume(self, requirements_id: int, resume: str) -> bool:
+    async def create_resume(self, requirements_id: int, resume: str) -> ResumeOut | None:
         try:
             return await self.resum_client.create_resume(requirements_id, resume)
         except NotFoundData:
-            return False
+            return None
 
     async def delete_resume(self, resume_ids: List[int]) -> bool:
         try:

@@ -16,7 +16,7 @@ class RequirementsModel:
         except Exception as e:
             raise e
 
-    async def create_new_requirement(self, requirement: str) -> bool:
+    async def create_new_requirement(self, requirement: str) -> RequirementsOut | None:
         try:
             return await self.req_client.create_requirement(requirement)
         except Exception as e:

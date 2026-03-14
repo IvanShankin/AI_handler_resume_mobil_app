@@ -44,17 +44,25 @@ class ResumeClient:
         except APIClientError as e:
             raise e
 
-    async def create_resume(self, requirements_id: int, resume: str) -> bool:
+    async def create_resume(self, requirements_id: int, resume: str) -> ResumeOut | None:
         """
         :raise NotFoundData: Если `requirements_id` не найден
         """
-        await self.api.request(
+        response = await self.api.request(
             "POST",
             "upload/create_resume/text",
             json={"resume": resume, "requirement_id": requirements_id}
 
         )
-        return True
+        data = response.json()
+        if isinstance(data, list) and data:
+            data = data[0]
+        if isinstance(data, dict):
+            try:
+                return ResumeOut.parse_obj(data)
+            except Exception:
+                return None
+        return None
 
     async def delete_resume(self, resume_ids: List[int]):
         await self.api.request(

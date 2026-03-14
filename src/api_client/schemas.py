@@ -26,7 +26,7 @@ class UserOut(BaseModel):
 class RequirementsOut(BaseModel):
     requirement_id: int
     user_id: int
-    requirements: str
+    requirement: str
 
 
 class DeleteProcessingResponse(BaseModel):
@@ -44,6 +44,7 @@ class DeleteRequirementsResponse(DeleteResumeResponse):
 class ResumeOut(BaseModel):
     resume_id: int
     user_id: int
+    requirement_id: int
     resume: str
 
 

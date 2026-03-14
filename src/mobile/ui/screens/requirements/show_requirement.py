@@ -44,6 +44,8 @@ class RequirementDetailScreen(Screen):
 
         self.requirement_id: Optional[int] = None
         self.requirement: Optional[RequirementsOut] = None
+        self._resumes_cache: List[ResumeOut] = []
+        self._resumes_loaded = False
 
         with self.canvas.before:
             Color(*self._conf.bg_color)
@@ -191,13 +193,21 @@ class RequirementDetailScreen(Screen):
     def set_requirement(self, requirement: RequirementsOut):
         self.requirement = requirement
         self.requirement_id = requirement.requirement_id
+        self._resumes_cache = []
+        self._resumes_loaded = False
 
     def on_pre_enter(self, *args):
         if not get_config().token_storage.get_access_token():
             self.manager.safe_switch("login")
             return
 
-        if self.requirement_id:
+        if self.requirement:
+            self.populate_requirement(self.requirement)
+            if self._resumes_loaded:
+                self.populate_resumes(self._resumes_cache)
+            else:
+                self.load_resumes()
+        elif self.requirement_id:
             self.load_requirement()
 
     def load_requirement(self):
@@ -225,19 +235,26 @@ class RequirementDetailScreen(Screen):
             )
             return
 
+        self.requirement = requirement
+        self.requirement_id = requirement.requirement_id
         Clock.schedule_once(lambda dt: self.populate_requirement(requirement))
+        if self._resumes_loaded:
+            Clock.schedule_once(lambda dt: self.populate_resumes(self._resumes_cache))
+        else:
+            self.load_resumes()
 
     def populate_requirement(self, requirement: RequirementsOut):
         self.requirement = requirement
         short_text = (
-            requirement.requirements[:300] + "..."
-            if len(requirement.requirements) > 300
-            else requirement.requirements
+            requirement.requirement[:300] + "..."
+            if len(requirement.requirement) > 300
+            else requirement.requirement
         )
         self.req_label.text = short_text
-        self.load_resumes()
 
     def load_resumes(self):
+        if not self.requirement_id:
+            return
         conf = get_config()
         fut = asyncio.run_coroutine_threadsafe(
             self.viewmodel_resum.get_resume(requirement_id=self.requirement_id),
@@ -254,7 +271,9 @@ class RequirementDetailScreen(Screen):
             )
             return
 
-        Clock.schedule_once(lambda dt: self.populate_resumes(resumes))
+        self._resumes_cache = resumes
+        self._resumes_loaded = True
+        Clock.schedule_once(lambda dt: self.populate_resumes(self._resumes_cache))
 
     def populate_resumes(self, resumes: List[ResumeOut]):
         self.resume_grid.clear_widgets()
@@ -285,9 +304,31 @@ class RequirementDetailScreen(Screen):
 
         self._update_resume_cols()
 
+    def add_resume_local(self, resume: ResumeOut):
+        if not resume:
+            return
+        self._resumes_cache = [resume] + [
+            item for item in self._resumes_cache
+            if item.resume_id != resume.resume_id
+        ]
+        self._resumes_loaded = True
+        if self.manager and self.manager.current == "requirement_detail":
+            self.populate_resumes(self._resumes_cache)
+
+    def remove_resume_local(self, resume_id: int):
+        if resume_id is None:
+            return
+        self._resumes_cache = [
+            item for item in self._resumes_cache
+            if item.resume_id != resume_id
+        ]
+        self._resumes_loaded = True
+        if self.manager and self.manager.current == "requirement_detail":
+            self.populate_resumes(self._resumes_cache)
+
     def show_full_requirement(self, *args):
         if self.requirement:
-            show_modal(self.requirement.requirements)
+            show_modal(self.requirement.requirement)
 
     def delete_requirement(self, *args):
         conf = get_config()
@@ -298,13 +339,20 @@ class RequirementDetailScreen(Screen):
                 conf.global_event_loop
             )
             if fut.result():
+                try:
+                    all_screen = self.manager.get_screen("all_requirements")
+                    all_screen.remove_requirement_local(self.requirement_id)
+                except Exception:
+                    pass
+                self.requirement = None
+                self.requirement_id = None
+                self._resumes_cache = []
+                self._resumes_loaded = False
                 show_modal("Требование успешно удалено!")
+                Clock.schedule_once(lambda dt: self.manager.safe_switch("all_requirements"))
             else:
                 show_modal("Требование не найдено!")
 
-            fut.add_done_callback(lambda f: Clock.schedule_once(
-                lambda dt: self.manager.safe_switch("all_requirements")
-            ))
 
         show_confirm_modal(
             "Вы действительно хотите удалить требование?",
@@ -331,3 +379,4 @@ class RequirementDetailScreen(Screen):
     def _update_bg(self, *args):
         self.bg.size = self.size
         self.bg.pos = self.pos
+

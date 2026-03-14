@@ -13,7 +13,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.metrics import dp, sp
 
-from src.api_client.schemas import ProcessingOut
+from src.api_client.schemas import ProcessingOut, ProcessingStatus
 from src.mobile.config import get_config
 from src.mobile.ui.screens.modal_window.modal_with_ok import show_modal
 from src.mobile.ui.screens.modal_window.modal_yes_or_no import show_confirm_modal
@@ -294,13 +294,33 @@ class ResumeProcessingScreen(Screen):
             Clock.schedule_once(lambda dt: self._no_processing(during_poll=self._is_polling_active()))
             return
 
+        # Если обработка ещё в процессе, продолжаем опрашивать
+        if processing.status == ProcessingStatus.IN_PROGRESS:
+            Clock.schedule_once(lambda dt: self._set_processing_in_progress(processing))
+            return
+
         Clock.schedule_once(lambda dt: self._set_processing(processing))
+
+    def _set_processing_in_progress(self, processing: ProcessingOut):
+        self.current_processing_id = processing.processing_id
+
+        # Не останавливаем опрос, продолжаем
+        self.processing_label.text = (
+            f"Обработка в процессе..."
+        )
+        self.processing_label.text_size = (self.width * 0.9, None)
+
+        self.create_processing_btn.disabled = True
+        self.delete_processing_btn.disabled = False
+
+        if not self._is_polling_active():
+            self._start_processing_polling()
 
     def _set_processing(self, processing: ProcessingOut):
         self.current_processing_id = processing.processing_id
         self._stop_processing_polling()
 
-        if not processing.success:
+        if not processing.success and processing.status == ProcessingStatus.FAILED:
             self.processing_label.text = (
                 "Обработка завершилась с ошибкой.\n\n"
                 f"Причина: {processing.message_error}\n"
@@ -341,9 +361,15 @@ class ResumeProcessingScreen(Screen):
             self.resume_model.delete_resume([self.current_resume_id]),
             conf.global_event_loop
         )
-        fut.add_done_callback(lambda f: Clock.schedule_once(
-            lambda dt: self.manager.safe_switch("requirement_detail")
-        ))
+        def _after_delete(_):
+            try:
+                detail_screen = self.manager.get_screen("requirement_detail")
+                detail_screen.remove_resume_local(self.current_resume_id)
+            except Exception:
+                pass
+            self.manager.safe_switch("requirement_detail")
+
+        fut.add_done_callback(lambda f: Clock.schedule_once(_after_delete))
 
     def create_processing(self, *_):
         conf = get_config()

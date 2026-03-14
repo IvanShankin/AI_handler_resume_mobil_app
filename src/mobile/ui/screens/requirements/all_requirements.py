@@ -30,6 +30,8 @@ class AllRequirementsScreen(Screen):
         self.viewmodel = viewmodel
         self.requirements_detail = requirements_detail
         self._conf = get_config()
+        self._requirements_cache: List[RequirementsOut] = []
+        self._has_cache = False
 
         with self.canvas.before:
             Color(*self._conf.bg_color)
@@ -115,6 +117,9 @@ class AllRequirementsScreen(Screen):
         if not get_config().token_storage.get_access_token():
             self.manager.safe_switch("login")
             return
+        if self._has_cache:
+            self.populate_requirements(self._requirements_cache)
+            return
         self.load_requirements()
 
     def _update_bg(self, *args):
@@ -145,12 +150,14 @@ class AllRequirementsScreen(Screen):
                 lambda dt, err=e: show_modal(f"Ошибка при загрузке: {err}")
             )
             return
-        Clock.schedule_once(lambda dt: self.populate_requirements(requirements))
+        self._requirements_cache = requirements
+        self._has_cache = True
+        Clock.schedule_once(lambda dt: self.populate_requirements(self._requirements_cache))
 
     def populate_requirements(self, requirements: List[RequirementsOut]):
         self.grid.clear_widgets()
         for req in requirements:
-            text = (req.requirements[:120] + "…") if len(req.requirements) > 120 else req.requirements
+            text = (req.requirement[:120] + "…") if len(req.requirement) > 120 else req.requirement
             btn = Button(
                 color=self._conf.text_color,
                 text=text,
@@ -171,6 +178,32 @@ class AllRequirementsScreen(Screen):
             self.grid.add_widget(btn)
 
         self._update_cols()
+
+    def set_requirements_cache(self, requirements: List[RequirementsOut]):
+        self._requirements_cache = list(requirements)
+        self._has_cache = True
+
+    def add_requirement_local(self, requirement: RequirementsOut):
+        if not requirement:
+            return
+        self._requirements_cache = [requirement] + [
+            req for req in self._requirements_cache
+            if req.requirement_id != requirement.requirement_id
+        ]
+        self._has_cache = True
+        if self.manager and self.manager.current == "all_requirements":
+            self.populate_requirements(self._requirements_cache)
+
+    def remove_requirement_local(self, requirement_id: int):
+        if requirement_id is None:
+            return
+        self._requirements_cache = [
+            req for req in self._requirements_cache
+            if req.requirement_id != requirement_id
+        ]
+        self._has_cache = True
+        if self.manager and self.manager.current == "all_requirements":
+            self.populate_requirements(self._requirements_cache)
 
     def _calc_cell_inner_width(self):
         cols = max(1, self.grid.cols)

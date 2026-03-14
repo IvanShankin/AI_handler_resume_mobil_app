@@ -32,14 +32,22 @@ class RequirementClient:
         except NotFoundData:
             return []
 
-    async def create_requirement(self, requirement: str) -> bool:
-        await self.api.request(
+    async def create_requirement(self, requirement: str) -> RequirementsOut | None:
+        response = await self.api.request(
             "POST",
             "upload/create_requirement/text",
             json={"requirement": requirement}
 
         )
-        return True
+        data = response.json()
+        if isinstance(data, list) and data:
+            data = data[0]
+        if isinstance(data, dict):
+            try:
+                return RequirementsOut.parse_obj(data)
+            except Exception:
+                return None
+        return None
 
     async def delete_requirements(self, requirements_ids: List[int]) -> bool:
         response = await self.api.request(

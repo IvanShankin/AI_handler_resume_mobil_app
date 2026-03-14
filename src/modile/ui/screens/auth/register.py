@@ -19,7 +19,7 @@ class RegisterScreen(Screen):
         self.viewmodel = viewmodel
 
         with self.canvas.before:
-            Color(0.95, 0.95, 0.95, 1)  # светло-серый
+            Color(0.92, 0.92, 0.92, 1)  # светло-серый
             self.bg = Rectangle(size=self.size, pos=self.pos)
 
         self.bind(size=self._update_bg, pos=self._update_bg)

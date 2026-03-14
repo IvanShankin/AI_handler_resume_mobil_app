@@ -1,7 +1,7 @@
 from typing import Optional, List
 
 from src.api_client.exceptions import NotFoundData
-from src.api_client.models import ResumeOut
+from src.api_client.schemas import ResumeOut
 from src.api_client.services.resume import ResumeClient
 
 

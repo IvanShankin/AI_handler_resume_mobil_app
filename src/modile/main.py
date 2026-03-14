@@ -9,7 +9,7 @@ from src.modile.utils.core_logger import setup_logging
 async def main():
     async_loop = asyncio.new_event_loop()
     conf = Config(
-        base_url = "http://localhost:8080",
+        base_url = "http://localhost:1297",
         global_event_loop = async_loop
     )
     set_config(conf)

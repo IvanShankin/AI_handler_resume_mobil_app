@@ -12,7 +12,7 @@ from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
 
-from src.api_client.models import RequirementsOut, ResumeOut
+from src.api_client.schemas import RequirementsOut, ResumeOut
 from src.modile.config import get_config
 from src.modile.ui.elements.buttons import RoundButton
 from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
@@ -24,12 +24,12 @@ from src.modile.view_models.resume import ResumeModel
 MIN_CELL_WIDTH = 260
 CARD_HEIGHT = 120
 
-BG_COLOR = (0.96, 0.96, 0.97, 1)
-PANEL_COLOR = (0.985, 0.985, 0.99, 1)
+BG_COLOR = (0.92, 0.92, 0.92, 1)
+PANEL_COLOR = (0.92, 0.92, 0.92, 1)
 CARD_COLOR = (1, 1, 1, 1)
 TEXT_COLOR = (0.14, 0.14, 0.16, 1)
 SUBTLE_TEXT = (0.35, 0.35, 0.38, 1)
-BTN_NEUTRAL_BG = (0.9, 0.9, 0.9, 1)
+BTN_NEUTRAL_BG = (0.8, 0.8, 0.8, 1)
 BTN_PRIMARY_BG = (0.28, 0.28, 0.31, 1)
 BTN_DANGER_BG = (0.4, 0.4, 0.43, 1)
 FAB_BG = (0.2, 0.2, 0.22, 1)
@@ -198,7 +198,7 @@ class RequirementDetailScreen(Screen):
 
     def set_requirement(self, requirement: RequirementsOut):
         self.requirement = requirement
-        self.requirement_id = requirement.requirements_id
+        self.requirement_id = requirement.requirement_id
 
     def on_pre_enter(self, *args):
         if not get_config().token_storage.get_access_token():

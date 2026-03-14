@@ -12,11 +12,11 @@ from src.modile.config import get_config
 from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
 from src.modile.view_models.requirements import RequirementsModel
 
-BG_COLOR = (0.96, 0.96, 0.97, 1)
-PANEL_COLOR = (0.985, 0.985, 0.99, 1)
+BG_COLOR = (0.92, 0.92, 0.92, 1)
+PANEL_COLOR = (0.92, 0.92, 0.92, 1)
 TEXT_COLOR = (0.14, 0.14, 0.16, 1)
 SUBTLE_COLOR = (0.35, 0.35, 0.38, 1)
-BTN_NEUTRAL_BG = (0.9, 0.9, 0.9, 1)
+BTN_NEUTRAL_BG = (0.8, 0.8, 0.8, 1)
 BTN_PRIMARY_BG = (0.28, 0.28, 0.31, 1)
 
 

@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from src.api_client.base import BaseAPIClient
 from src.api_client.exceptions import NotFoundData, APIClientError, NotEnoughArguments, ToManyArguments
-from src.api_client.models import ResumeOut
+from src.api_client.schemas import ResumeOut
 
 
 class ResumeClient:
@@ -59,7 +59,7 @@ class ResumeClient:
     async def delete_resume(self, resume_ids: List[int]):
         await self.api.request(
             "DELETE",
-            "upload/delete_resume",
+            "upload/delete_resumes",
             json={"resume_ids": resume_ids}
         )
         return True

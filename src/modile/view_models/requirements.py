@@ -1,7 +1,7 @@
 from typing import Optional, List
 
 from src.api_client.exceptions import NotFoundData
-from src.api_client.models import RequirementsOut
+from src.api_client.schemas import RequirementsOut
 from src.api_client.services.requirements import RequirementClient
 
 

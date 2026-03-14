@@ -1,8 +1,8 @@
 from typing import List, Optional
 
 from src.api_client.base import BaseAPIClient
-from src.api_client.exceptions import APIClientError, NotFoundData
-from src.api_client.models import RequirementsOut, IsDeleteOut
+from src.api_client.exceptions import NotFoundData
+from src.api_client.schemas import RequirementsOut, DeleteRequirementsResponse
 
 
 class RequirementClient:
@@ -35,8 +35,8 @@ class RequirementClient:
     async def create_requirement(self, requirement: str) -> bool:
         await self.api.request(
             "POST",
-            "upload/create_requirements/text",
-            json={"requirements": requirement}
+            "upload/create_requirement/text",
+            json={"requirement": requirement}
 
         )
         return True
@@ -45,9 +45,9 @@ class RequirementClient:
         response = await self.api.request(
             "DELETE",
             "upload/delete_requirements",
-            json={"requirements_ids": requirements_ids}
+            json={"requirement_ids": requirements_ids}
 
         )
         data = response.json()
 
-        return IsDeleteOut.model_validate(data).is_deleted
+        return bool(DeleteRequirementsResponse.model_validate(data))

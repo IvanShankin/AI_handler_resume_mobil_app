@@ -4,13 +4,16 @@ from pydantic import ValidationError
 
 from src.api_client.services.auth import AuthClient
 from src.api_client.exceptions import UserAlreadyRegistered, UserNotFound, Unauthorized
-from src.api_client.models import UserCreate, TokenResponse
+from src.api_client.schemas import UserCreate, TokenResponse
 from src.modile.config import get_config
 
 
 class AuthViewModel:
     def __init__(self, auth_client: AuthClient):
         self.auth_client = auth_client
+
+    async def check_health(self) -> bool:
+        return await self.auth_client.check_health()
 
     async def login(self, username: str, password: str) -> Tuple[TokenResponse | None, str]:
         if not username or not password:

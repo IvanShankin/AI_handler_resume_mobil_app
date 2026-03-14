@@ -12,7 +12,7 @@ from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
 
-from src.api_client.models import RequirementsOut
+from src.api_client.schemas import RequirementsOut
 from src.modile.config import get_config
 from src.modile.ui.elements.buttons import RoundButton
 from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
@@ -22,8 +22,8 @@ from src.modile.view_models.requirements import RequirementsModel
 MIN_CELL_WIDTH = 260
 CARD_HEIGHT = 120
 
-BG_COLOR = (0.96, 0.96, 0.97, 1)
-PANEL_COLOR = (0.985, 0.985, 0.99, 1)
+BG_COLOR = (0.92, 0.92, 0.92, 1)
+PANEL_COLOR = (0.92, 0.92, 0.92, 1)
 CARD_COLOR = (1, 1, 1, 1)
 TEXT_COLOR = (0.14, 0.14, 0.16, 1)
 SUBTLE_TEXT_COLOR = (0.35, 0.35, 0.38, 1)

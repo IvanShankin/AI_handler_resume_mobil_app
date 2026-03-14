@@ -1,6 +1,6 @@
 from src.api_client.base import BaseAPIClient
 from src.api_client.exceptions import UserAlreadyRegistered, UserNotFound, APIClientError
-from src.api_client.models import (
+from src.api_client.schemas import (
     UserCreate,
     UserOut,
     TokenResponse,
@@ -68,6 +68,16 @@ class AuthClient:
             if e.status_code == 403:
                 raise UserNotFound()
             raise e
+
+    async def check_health(self) -> bool:
+        try:
+            await self.api.request(
+                "GET",
+                "/storage/health"
+            )
+            return True
+        except Exception:
+            return False
 
     async def logout(self) -> None:
         """Выйдет из учётной записи и сделает невалидным refresh токен"""

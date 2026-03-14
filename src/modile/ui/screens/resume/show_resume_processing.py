@@ -2,7 +2,9 @@ import asyncio
 from typing import Optional
 
 from kivy.clock import Clock
+from kivy.core.clipboard import Clipboard
 from kivy.graphics import Color, Rectangle, RoundedRectangle
+from kivy.uix.image import Image
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
@@ -10,7 +12,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 
-from src.api_client.models import ProcessingDetailOut
+from src.api_client.schemas import ProcessingOut
 from src.modile.config import get_config
 from src.modile.ui.screens.modal_window.modal_with_ok import show_modal
 from src.modile.ui.screens.modal_window.modal_yes_or_no import show_confirm_modal
@@ -18,10 +20,10 @@ from src.modile.utils.core_logger import get_logger
 from src.modile.view_models.resume import ResumeModel
 from src.modile.view_models.processing import ProcessingModel
 
-BG_COLOR = (0.96, 0.96, 0.97, 1)
-PANEL_COLOR = (0.985, 0.985, 0.99, 1)
+BG_COLOR = (0.92, 0.92, 0.92, 1)
+PANEL_COLOR = (0.92, 0.92, 0.92, 1)
 TEXT_COLOR = (0.14, 0.14, 0.16, 1)
-BTN_NEUTRAL_BG = (0.9, 0.9, 0.9, 1)
+BTN_NEUTRAL_BG = (0.8, 0.8, 0.8, 1)
 BTN_PRIMARY_BG = (0.28, 0.28, 0.31, 1)
 BTN_DANGER_BG = (0.4, 0.4, 0.43, 1)
 
@@ -84,6 +86,19 @@ class ResumeProcessingScreen(Screen):
         )
         back_btn.bind(on_release=lambda *_: self.manager.safe_switch("requirement_detail"))
         root.add_widget(back_btn)
+
+        copy_btn = Button(
+            text="",
+            size_hint=(None, None),
+            size=(64, 64),
+            pos_hint={"right": 0.97, "top": 0.965},
+            background_normal=str(get_config().copy_icon),
+            background_color=BTN_NEUTRAL_BG,
+        )
+
+        copy_btn.bind(on_release=self.copy_processing_to_clipboard)
+
+        root.add_widget(copy_btn)
 
         self.resume_title = Label(
             text="Резюме",
@@ -251,7 +266,7 @@ class ResumeProcessingScreen(Screen):
 
         Clock.schedule_once(lambda dt: self._set_processing(processing))
 
-    def _set_processing(self, processing: ProcessingDetailOut):
+    def _set_processing(self, processing: ProcessingOut):
         self.current_processing_id = processing.processing_id
         self._stop_processing_polling()
 
@@ -363,6 +378,11 @@ class ResumeProcessingScreen(Screen):
         self._processing_poll_attempts += 1
         self._is_processing_request_in_flight = True
         self._load_processing()
+
+    def copy_processing_to_clipboard(self, *_):
+        text = self.processing_label.text
+        if text:
+            Clipboard.copy(text)
 
     def delete_processing(self, *_):
         if not self.current_processing_id:

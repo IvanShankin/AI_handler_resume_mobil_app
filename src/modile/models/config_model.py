@@ -15,6 +15,7 @@ class Config(BaseModel):
     base: Path = Path(__file__).resolve().parents[3]
     media: Path = base / Path("media")
     log_file: Path = media / Path("mobile_app.log")
+    copy_icon: Path = media / Path("copy_icon.png")
 
     global_event_loop: AbstractEventLoop
     token_storage: TokenStorage = TokenStorage()

@@ -1,7 +1,7 @@
 from typing import Optional, List
 
 from src.api_client.exceptions import NotFoundData
-from src.api_client.models import ProcessingDetailOut
+from src.api_client.schemas import ProcessingOut
 from src.api_client.services.processing import ProcessingClient
 
 
@@ -9,7 +9,7 @@ class ProcessingModel:
     def __init__(self, proc_client: ProcessingClient):
         self.proc_client = proc_client
 
-    async def get_processing(self, resume_id: Optional[int]) -> ProcessingDetailOut:
+    async def get_processing(self, resume_id: Optional[int]) -> ProcessingOut:
         processing = await self.proc_client.get_processing(resume_id)
         return processing
 

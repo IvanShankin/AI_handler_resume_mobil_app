@@ -20,7 +20,7 @@ class LoginScreen(Screen):
 
         # --- UI остаётся ---
         with self.canvas.before:
-            Color(0.95, 0.95, 0.95, 1)
+            Color(0.92, 0.92, 0.92, 1)
             self.bg = Rectangle(size=self.size, pos=self.pos)
 
         self.bind(size=self._update_bg, pos=self._update_bg)
@@ -55,6 +55,9 @@ class LoginScreen(Screen):
         )
 
         future.add_done_callback(self._on_refresh_done)
+
+        if self.viewmodel.check_health():
+            show_modal("Сервер не отвечает по данному url: http://localhost:1297")
 
     def _update_bg(self, *args):
         self.bg.size = self.size

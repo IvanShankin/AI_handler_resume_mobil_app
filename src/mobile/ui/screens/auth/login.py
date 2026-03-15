@@ -18,27 +18,34 @@ class LoginScreen(Screen):
     def __init__(self, viewmodel: AuthViewModel, **kwargs):
         super().__init__(**kwargs)
         self.viewmodel = viewmodel
-        conf = get_config()
+        self.conf = get_config()
 
         # --- UI остаётся ---
         with self.canvas.before:
-            Color(*conf.bg_color)
+            Color(*self.conf.bg_color)
             self.bg = Rectangle(size=self.size, pos=self.pos)
 
         self.bind(size=self._update_bg, pos=self._update_bg)
 
         anchor = AnchorLayout(anchor_x='center', anchor_y='center')
-        layout = BoxLayout(orientation="vertical", spacing=dp(15), size_hint=(0.8, None))
+        layout = BoxLayout(orientation="vertical", spacing=dp(15), size_hint=(1, None))
         layout.bind(minimum_height=layout.setter('height'))
 
-        self.username_input = create_textinput("Email")
-        self.password_input = create_textinput("Password", password=True)
-        self.message_label = Label(size_hint=(1, None), height=dp(30))
+        self.username_input = create_textinput("Email", height=dp(45))
+        self.username_input.pos_hint = {"center_x": 0.5}
 
-        login_btn = create_button("Вход")
+        self.password_input = create_textinput("Password", password=True, height=dp(45))
+        self.password_input.pos_hint = {"center_x": 0.5}
+
+        self.message_label = Label(size_hint=(1, None), height=dp(40))
+        self.message_label.pos_hint = {"center_x": 0.5}
+
+        login_btn = create_button("Вход", height=dp(55))
+        login_btn.pos_hint = {"center_x": 0.5}
         login_btn.bind(on_release=self.login_clicked)
 
-        go_register_btn = create_button("Зарегистрироваться")
+        go_register_btn = create_button("Зарегистрироваться", height=dp(55))
+        go_register_btn.pos_hint = {"center_x": 0.5}
         go_register_btn.bind(on_release=self.go_to_register)
 
         layout.add_widget(self.username_input)
@@ -52,17 +59,29 @@ class LoginScreen(Screen):
 
         future = asyncio.run_coroutine_threadsafe(
             self.viewmodel.check_refresh_token(),
-            conf.global_event_loop
+            self.conf.global_event_loop
         )
 
         future.add_done_callback(self._on_refresh_done)
 
-        if self.viewmodel.check_health():
-            show_modal("Сервер не отвечает по данному url: http://localhost:1297")
+        future_2 = asyncio.run_coroutine_threadsafe(
+            self.viewmodel.check_health(),
+            self.conf.global_event_loop
+        )
+        future_2.add_done_callback(self._on_check_health_done)
 
     def _update_bg(self, *args):
         self.bg.size = self.size
         self.bg.pos = self.pos
+
+    def _on_check_health_done(self, future):
+        try:
+            success = future.result()
+        except Exception:
+            return
+
+        if not success:
+            show_modal(f"Сервер не отвечает по данному url: {self.conf.base_url}")
 
     def _on_refresh_done(self, future):
         try:
@@ -83,10 +102,9 @@ class LoginScreen(Screen):
         username = self.username_input.text
         password = self.password_input.text
 
-        conf = get_config()
         asyncio.run_coroutine_threadsafe(
             self._handle_login(username, password),
-            conf.global_event_loop
+            self.conf.global_event_loop
         )
 
     def _show_error(self, message: str):

@@ -286,18 +286,25 @@ class RequirementDetailScreen(Screen):
             )
 
             btn = Button(
+                color=self._conf.text_color,
                 text=text,
                 size_hint_y=None,
                 height=CARD_HEIGHT,
                 halign="left",
                 valign="middle",
+                text_size=(None, None),
                 background_normal='',
                 background_color=self._conf.card_color,
-                color=self._conf.text_color,
                 padding=(dp(16), dp(10)),
+                border=(0, 0, 0, 0)  # важно
             )
+            # текст всегда внутри реальной ширины кнопки
+            btn.bind(size=lambda inst, val: setattr(
+                inst,
+                "text_size",
+                (inst.width - dp(32), inst.height - dp(20))
+            ))
 
-            btn.text_size = (self._calc_resume_cell_width(), CARD_HEIGHT - dp(22))
             btn.bind(on_release=lambda inst, r=resume: self.open_resume(r))
 
             self.resume_grid.add_widget(btn)

@@ -105,17 +105,31 @@ class ResumeProcessingScreen(Screen):
         )
         self.vbox.add_widget(self.resume_title)
 
-        self.resume_scroll = ScrollView(size_hint=(1, None), height=dp(130))
+        self.resume_scroll = ScrollView(
+            size_hint=(1, None),
+            height=dp(130),
+            bar_color=(0.5, 0.5, 0.55, 0.7),
+            bar_inactive_color=(0.75, 0.75, 0.78, 0.3),
+        )
+
         self.resume_label = Label(
             text="",
-            size_hint_y=None,
+            size_hint=(1, None),
             halign="left",
             valign="top",
             color=self._conf.text_color,
             font_size=sp(16),
+            padding=(dp(15), 0),
         )
+
+        # text_size учитывает padding
+        self.resume_label.bind(
+            width=lambda inst, w: setattr(inst, "text_size", (w - inst.padding[0] * 2, None))
+        )
+
+        # автоматическая высота
         self.resume_label.bind(texture_size=self._update_resume_height)
-        self.resume_scroll.bind(width=self._update_text_width)
+
         self.resume_scroll.add_widget(self.resume_label)
         self.vbox.add_widget(self.resume_scroll)
 
@@ -137,8 +151,16 @@ class ResumeProcessingScreen(Screen):
             valign="top",
             color=self._conf.text_color,
             font_size=sp(16),
+            padding=(dp(15), 0),
         )
+
+        # ширина области текста = ширина label
+        self.processing_label.bind(
+            width=lambda inst, w: setattr(inst, "text_size", (w - inst.padding[0] * 2, None))
+        )
+        # автоматическая высота по тексту
         self.processing_label.bind(texture_size=self._update_processing_height)
+
         self.processing_scroll.add_widget(self.processing_label)
         self.processing_scroll.bind(width=self._update_text_width)
 

@@ -169,12 +169,17 @@ class AllRequirementsScreen(Screen):
                 background_normal='',
                 background_color=self._conf.card_color,
                 padding=(dp(16), dp(10)),
+                border=(0, 0, 0, 0)  # важно
             )
-            btn.text_size = (self._calc_cell_inner_width(), CARD_HEIGHT - dp(22))
-            btn.halign = "left"
-            btn.valign = "middle"
+            # текст всегда внутри реальной ширины кнопки
+            btn.bind(size=lambda inst, val: setattr(
+                inst,
+                "text_size",
+                (inst.width - dp(32), inst.height - dp(20))
+            ))
 
             btn.bind(on_release=lambda inst, r=req: self.open_requirement(r))
+
             self.grid.add_widget(btn)
 
         self._update_cols()
@@ -204,10 +209,6 @@ class AllRequirementsScreen(Screen):
         self._has_cache = True
         if self.manager and self.manager.current == "all_requirements":
             self.populate_requirements(self._requirements_cache)
-
-    def _calc_cell_inner_width(self):
-        cols = max(1, self.grid.cols)
-        return max(dp(100), (self.width * 0.96) / cols - dp(30))
 
     def open_requirement(self, requirement: RequirementsOut):
         self.requirements_detail.set_requirement(requirement=requirement)

@@ -19,7 +19,8 @@ def get_base_dir() -> Path:
 
 
 class Config(BaseModel):
-    base_url: str = "http://localhost:8080"
+    # МЕНЯТЬ
+    base_url: str = "https://noncontagiously-chylocaulous-aide.ngrok-free.dev"
 
     max_char_requirements: int = 1000
     max_char_resume: int = 5000
@@ -39,9 +40,10 @@ class Config(BaseModel):
     media: Path = base / Path("media")
     log_file: Path = media / Path("mobile_app.log")
     copy_icon: Path = media / Path("copy_icon.png")
+    tokens: Path = media / Path("tokens.json")
 
     global_event_loop: AbstractEventLoop
-    token_storage: TokenStorage = TokenStorage()
+    token_storage: TokenStorage = TokenStorage(tokens)
 
     class Config:
         arbitrary_types_allowed = True
